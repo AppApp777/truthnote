@@ -1,0 +1,107 @@
+/* ===== TruthNote 平台注入样式 ===== */
+
+/* 核查按钮 */
+.tn-platform-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  background: #000000;
+  color: #FFFFFF;
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  line-height: 1;
+  font-family: "Alibaba PuHuiTi", "Source Han Sans", "Microsoft YaHei", sans-serif;
+  transition: opacity 150ms;
+  margin-left: 6px;
+}
+
+.tn-platform-btn:hover {
+  opacity: 0.8;
+}
+
+.tn-pbtn-eye {
+  width: 5px;
+  height: 5px;
+  background: #FFFFFF;
+  display: inline-block;
+}
+
+.tn-pbtn-label {
+  font-size: 11px;
+  margin-left: 1px;
+}
+
+.tn-pbtn--loading .tn-pbtn-eye {
+  animation: tn-blink 0.5s linear infinite alternate;
+}
+
+@keyframes tn-blink {
+  from { opacity: 1; }
+  to { opacity: 0.2; }
+}
+
+/* 内嵌结果卡 */
+.tn-inline-result {
+  margin: 8px 0;
+  font-family: "Alibaba PuHuiTi", "Source Han Sans", "Microsoft YaHei", sans-serif;
+  animation: tn-slideDown 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes tn-slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tn-inline-claim {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-left: 3px solid #999;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tn-inline-tag {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.tn-inline-text {
+  flex: 1;
+  min-width: 0;
+  color: #000000;
+  font-size: 13px;
+}
+
+.tn-inline-evidence {
+  width: 100%;
+  font-size: 11px;
+  color: #666666;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.tn-inline-link {
+  color: #666666;
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.tn-inline-link:hover {
+  color: #000000;
+}
+
+.tn-inline-summary {
+  font-size: 11px;
+  color: #999999;
+  padding: 4px 0;
+}

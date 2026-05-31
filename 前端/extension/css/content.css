@@ -1,0 +1,747 @@
+/* ===== TruthNote 动效令牌（注入页面用；variables.css 不进 content script，故放这里） ===== */
+:root {
+  /* 时长三档：反馈 / 入场 / 揭晓 */
+  --tn-mo-fast: 150ms;       /* hover / 状态切换 */
+  --tn-mo-enter: 240ms;      /* 卡片/面板入场 */
+  --tn-mo-final: 360ms;      /* final 卡郑重落地 */
+  --tn-mo-chain: 200ms;      /* reasoning_chain 逐条显形间隔 */
+  /* 静置慢循环 */
+  --tn-mo-breathe: 5.5s;     /* 挂件胶囊呼吸 */
+  --tn-mo-steppulse: 2.6s;   /* 当前步脉冲 */
+  --tn-mo-cardrest: 7s;      /* 卡片阴影微澜（最慢档） */
+  --tn-mo-lumen: 6s;         /* 横条明度流动 */
+  --tn-mo-glow: 4s;          /* final 判定色 glow */
+  /* 缓动 */
+  --tn-ease-enter: cubic-bezier(.16,1,.3,1);      /* expo-out，落桌 */
+  --tn-ease-spring: cubic-bezier(.34,1.56,.64,1); /* 弹性盖章 */
+  --tn-ease-sine: ease-in-out;                    /* 正弦呼吸 */
+  --tn-ease-out: cubic-bezier(0,0,.2,1);          /* 通用 ease-out */
+  /* stagger 步长（JS 侧用 Math.min(i,8) 封顶防长列表挤牙膏） */
+  --tn-stagger-step: 55ms;
+}
+
+/* ===== TruthNote Content Script Styles ===== */
+
+/* ===== 选中触点（选文字后出现的 ■■ 查 按钮） ===== */
+.tn-trigger {
+  position: fixed;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: #000000;
+  color: #FFFFFF;
+  font-family: "Alibaba PuHuiTi", "Source Han Sans", "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  animation: tn-fadeIn 200ms cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.tn-trigger-eye {
+  width: 6px;
+  height: 6px;
+  background: #FFFFFF;
+}
+
+@keyframes tn-fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== 常驻挂件（右下角小T） ===== */
+.tn-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2147483646;
+  font-family: "Alibaba PuHuiTi", "Source Han Sans", "Microsoft YaHei", sans-serif;
+  transition: transform 200ms var(--tn-ease-out);
+  /* 2026-05-31 用户取消右下角"小T 待机挂件"功能 → 关掉常驻挂件。
+     核查触发改由选中文字旁的 .tn-trigger（■■ 查）+ 面板自动弹出，不依赖本挂件；
+     挂件元素仍创建（隐藏），故 setWidgetState 等 querySelector 不报错。如需恢复，删此行。 */
+  display: none !important;
+}
+
+/* -- 收起态：只有两只眼睛 -- */
+.tn-widget-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: #000000;
+  color: #FFFFFF;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: transform 200ms var(--tn-ease-out), box-shadow 200ms var(--tn-ease-out);
+}
+
+.tn-widget-pill:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-1px);
+}
+
+.tn-widget-eye {
+  width: 8px;
+  height: 8px;
+  background: #FFFFFF;
+  transition: opacity 150ms ease-out, transform 150ms ease-out;
+}
+
+/* 扫描态左眼 */
+.tn-widget-eye--scan {
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 8px solid #FFFFFF;
+  background: none;
+}
+
+/* 错误态左眼 */
+.tn-widget-eye--error {
+  width: 8px;
+  height: 2px;
+  background: #FFFFFF;
+}
+
+.tn-widget-label {
+  font-size: 11px;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 呼吸动画（待机）：整个黑胶囊极轻呼吸 + 阴影同相位起伏；眼睛另走眨眼（见下） */
+.tn-widget--idle .tn-widget-pill {
+  animation: tn-breathe-pill var(--tn-mo-breathe) var(--tn-ease-sine) infinite;
+  will-change: transform;
+}
+
+@keyframes tn-breathe-pill {
+  0%, 100% { transform: scale(1);     box-shadow: 0 4px 16px rgba(0,0,0,0.20); }
+  50%      { transform: scale(1.012); box-shadow: 0 6px 22px rgba(0,0,0,0.26); }
+}
+
+/* 眨眼（待机 / 出结果态）：照搬设置页 opt-blink 的眼睑节奏——长睁→95% 时快速一眯→睁，4.2s 一轮。
+   只给这两个"静置且眼睛是正方形"的态加，核查中的扫描眼 / 点击的缩放眼 / 出错的横线眼各有自处理、互斥不覆盖。
+   blink 走 transform(scaleY)，与胶囊呼吸(另一元素)、checking 的 opacity 扫描不冲突。
+   reduced-motion 下由 `.tn-widget-eye` 那条 `animation:none !important` 兜底关掉（!important 压过本规则）。 */
+.tn-widget--idle .tn-widget-eye,
+.tn-widget--ready .tn-widget-eye {
+  animation: tn-eye-blink 4.2s ease-in-out infinite;
+}
+/* 右眼晚 0.15s，两眼不完全同步，更像活物（用 :nth-child(2) 对齐设置页 opt-eye:nth-child(2)，不依赖 id） */
+.tn-widget--idle .tn-widget-eye:nth-child(2),
+.tn-widget--ready .tn-widget-eye:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+@keyframes tn-eye-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(0.15); }
+}
+
+/* 扫描动画（核查中） */
+.tn-widget--checking .tn-widget-eye {
+  animation: tn-blink-eye 0.5s linear infinite alternate;
+}
+
+@keyframes tn-blink-eye {
+  from { opacity: 1; }
+  to { opacity: 0.2; }
+}
+
+/* 结果就绪闪烁 */
+.tn-widget--ready .tn-widget-pill {
+  animation: tn-pulse 0.6s ease-in-out 3;
+}
+
+@keyframes tn-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* "接住"反馈动效 —— 点查瞬间挂件膨胀+闪一下 */
+.tn-widget--catch .tn-widget-pill {
+  animation: tn-catch 380ms cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes tn-catch {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,0,0,0.4); }
+  35%  { transform: scale(1.22); box-shadow: 0 0 0 12px rgba(0,0,0,0); }
+  60%  { transform: scale(0.94); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}
+
+.tn-widget--catch .tn-widget-eye {
+  animation: tn-catch-eye 380ms ease-out;
+}
+
+@keyframes tn-catch-eye {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(0.5); }
+}
+
+/* 进度条 */
+.tn-widget-progress {
+  height: 2px;
+  background: rgba(255,255,255,0.15);
+  overflow: hidden;
+}
+
+.tn-widget-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: #FFFFFF;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 300ms linear;
+}
+
+/* -- 待机悬停提示气泡：只在 idle 态出现，on-brand 黑底直角，浮在挂件正上方 -- */
+.tn-widget-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  white-space: nowrap;
+  background: #000000;
+  color: #FFFFFF;
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 5px 9px;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;   /* 纯提示，不抢挂件点击 */
+  transition: opacity var(--tn-mo-fast) var(--tn-ease-out),
+              transform var(--tn-mo-fast) var(--tn-ease-out);
+}
+
+/* 仅待机态悬停才显形——核查中/出结果时挂件自带文案，提示不打架 */
+.tn-widget--idle:hover .tn-widget-tip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== 展开的结果面板（从挂件弹出） ===== */
+.tn-panel {
+  position: fixed;
+  bottom: 60px;
+  right: 20px;
+  z-index: 2147483645;
+  width: 340px;
+  max-height: 480px;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border: 1px solid #000000;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  font-family: "Alibaba PuHuiTi", "Source Han Sans", "Microsoft YaHei", sans-serif;
+  transform-origin: bottom right;   /* 从右下角挂件位置生长 */
+  animation: tn-panelIn var(--tn-mo-enter) var(--tn-ease-enter);
+}
+
+@keyframes tn-panelIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tn-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #000000;
+  position: sticky;
+  top: 0;
+}
+
+.tn-panel-eyes {
+  display: flex;
+  gap: 4px;
+}
+
+.tn-panel-eye {
+  width: 8px;
+  height: 8px;
+  background: #FFFFFF;
+  /* 顶栏小T眼睛眨眼：复用挂件同款 tn-eye-blink（scaleY 眼睑节奏、4.2s 一轮），
+     和右下角挂件一致的活物感；reduced-motion 下由下方 @media 兜底关掉 */
+  animation: tn-eye-blink 4.2s ease-in-out infinite;
+  transform-origin: center;
+}
+/* 右眼晚 0.15s，两眼不同步更像活物——顶栏 .tn-panel-eyes 与「小T 说」头 .tn-panel-explanation-head 两处都加 */
+.tn-panel-eyes .tn-panel-eye:nth-child(2),
+.tn-panel-explanation-head .tn-panel-eye:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.tn-panel-title {
+  font-size: 11px;
+  color: rgba(255,255,255,0.8);
+}
+
+.tn-panel-close {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.tn-panel-close:hover {
+  opacity: 0.7;
+}
+
+/* 路演放大按钮（黑底头里的白描边小钮，直角，on-brand） */
+.tn-panel-zoom {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.45);
+  color: #FFFFFF;
+  font-size: 11px;
+  line-height: 1;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tn-panel-zoom:hover { background: rgba(255,255,255,0.16); }
+
+/* ===== 路演放大态：整张面板等比放大到全屏竖屏（比例不变）===== */
+/* 用 transform: scale 等比放大（文字矢量放大依旧清晰）；固定 height 让自然尺寸稳定、缩放因子不抖。 */
+.tn-panel--zoom {
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  height: 480px !important;       /* = max-height，配合 scale 铺满竖直方向；内容超出仍内部滚动 */
+  max-height: 480px !important;
+  transform: translate(-50%, -50%) scale(var(--tn-zoom, 1.8)) !important;
+  transform-origin: center center !important;
+  animation: none !important;      /* 关入场动画，避免与放大 transform 打架 */
+}
+
+/* 半透明遮罩：盖住页面、突出放大的面板（z-index 比面板低 1）；点它退出放大 */
+.tn-zoom-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 2147483644;
+  cursor: zoom-out;
+  animation: tn-fadeIn 160ms ease;
+}
+
+/* 原文摘要 */
+.tn-panel-original {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #666666;
+  background: #F5F5F5;
+  line-height: 1.5;
+  border-bottom: 1px solid #E5E5E5;
+  max-height: 60px;
+  overflow: hidden;
+}
+
+/* 声明卡片 */
+.tn-panel-claims {
+  padding: 8px 0;
+}
+
+.tn-panel-claim {
+  display: flex;
+  margin: 0 12px 6px;
+  animation: tn-claimIn 300ms cubic-bezier(0, 0, 0.2, 1) backwards;
+}
+
+.tn-panel-claim:nth-child(1) { animation-delay: 0ms; }
+.tn-panel-claim:nth-child(2) { animation-delay: 80ms; }
+.tn-panel-claim:nth-child(3) { animation-delay: 160ms; }
+.tn-panel-claim:nth-child(4) { animation-delay: 240ms; }
+.tn-panel-claim:nth-child(5) { animation-delay: 320ms; }
+
+@keyframes tn-claimIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tn-panel-claim-line {
+  width: 3px;
+  flex-shrink: 0;
+}
+
+.tn-panel-claim-line--true { background: #3ECF72; }
+.tn-panel-claim-line--false { background: #F43939; }
+.tn-panel-claim-line--unverified { background: #FFB020; }
+
+.tn-panel-claim-body {
+  flex: 1;
+  padding: 8px 10px;
+}
+
+.tn-panel-claim--true .tn-panel-claim-body { background: #E8F8ED; }
+.tn-panel-claim--false .tn-panel-claim-body { background: #FDE8E8; }
+.tn-panel-claim--unverified .tn-panel-claim-body { background: #FFF3DB; }
+
+.tn-panel-tag {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.tn-panel-tag--true { background: #3ECF72; color: #000; }
+.tn-panel-tag--false { background: #F43939; color: #fff; }
+.tn-panel-tag--unverified { background: #FFB020; color: #000; }
+
+.tn-panel-claim-text {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #000;
+  margin-bottom: 4px;
+}
+
+.tn-panel-claim-evidence {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.3;
+}
+
+.tn-panel-claim-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.tn-panel-claim-link:hover {
+  color: #000;
+}
+
+/* ===== 综合解释（评委杀器：小T 说为什么） ===== */
+.tn-panel-explanation {
+  margin: 0 12px 8px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #FAFAFA 0%, #F4F4F4 100%);
+  border-left: 3px solid #000;
+  position: relative;
+}
+
+.tn-panel-explanation-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #DDD;
+}
+
+.tn-panel-explanation-head .tn-panel-eye {
+  width: 6px;
+  height: 6px;
+  background: #000;
+  display: inline-block;
+}
+
+.tn-panel-explanation-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #000;
+  letter-spacing: 0.5px;
+}
+
+.tn-panel-explanation-body {
+  font-size: 12px;
+  line-height: 1.65;
+  color: #1A1A1A;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 打字机光标（typing 期间显示） */
+.tn-panel-explanation-body.tn-typing::after {
+  content: "▍";
+  color: #000;
+  animation: tn-cursor-blink 800ms steps(1) infinite;
+  margin-left: 1px;
+}
+
+@keyframes tn-cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* markdown 渲染后样式 */
+.tn-expl-h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+  margin: 10px 0 4px;
+  letter-spacing: 0.3px;
+}
+
+.tn-expl-h3 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin: 8px 0 3px;
+}
+
+.tn-expl-li {
+  font-size: 12px;
+  color: #333;
+  margin: 2px 0 2px 8px;
+  line-height: 1.6;
+}
+
+.tn-expl-p {
+  font-size: 12px;
+  color: #1A1A1A;
+  margin: 2px 0;
+  line-height: 1.6;
+}
+
+.tn-expl-br {
+  height: 6px;
+}
+
+.tn-panel-explanation-body strong {
+  color: #000;
+  font-weight: 700;
+}
+
+/* 总结栏 */
+.tn-panel-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid #E5E5E5;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+}
+
+.tn-panel-counts {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.tn-panel-count-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tn-panel-dot {
+  width: 6px;
+  height: 6px;
+}
+
+.tn-panel-dot--true { background: #3ECF72; }
+.tn-panel-dot--false { background: #F43939; }
+.tn-panel-dot--unverified { background: #FFB020; }
+
+.tn-panel-btn-ghost {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 2px 4px;
+}
+
+.tn-panel-btn-ghost:hover {
+  color: #000;
+}
+
+/* 核查中面板（新版：上方流水线 + 下方卡片瀑布） */
+.tn-panel-loading {
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.tn-panel-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* 步骤之间的连线 */
+.tn-panel-steps::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: #E5E5E5;
+  z-index: 0;
+}
+
+.tn-panel-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  font-size: 9px;          /* 流程标签是次要信息——缩小、压暗，给声明/判定让位 */
+  color: #AAA;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  background: #FFF;
+  transition: color 200ms;
+}
+
+.tn-panel-step--done {
+  color: #888;             /* 已完成步骤压暗，不与重要信息抢眼球 */
+}
+
+.tn-panel-step--active {
+  color: #444;             /* 当前步骤稍亮一点点，但仍弱于声明/判定 */
+  font-weight: 500;
+}
+
+.tn-panel-step-icon {
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  flex-shrink: 0;
+  transition: all 200ms;
+}
+
+.tn-panel-step-icon--done {
+  background: #000;
+  color: #fff;
+}
+
+.tn-panel-step-icon--active {
+  background: #000;
+  color: #FFF;
+  position: relative;
+  animation: tn-step-pulse var(--tn-mo-steppulse) var(--tn-ease-sine) infinite;
+}
+
+.tn-panel-step-icon--active::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1px solid #000;
+  opacity: 0.35;
+  animation: tn-step-ring var(--tn-mo-steppulse) ease-out infinite;
+}
+
+@keyframes tn-step-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@keyframes tn-step-ring {
+  0%   { opacity: 0.35; transform: scale(1); }
+  100% { opacity: 0;    transform: scale(1.5); }
+}
+
+.tn-panel-step-icon--pending {
+  background: #FFF;
+  border: 1.5px solid #DDD;
+}
+
+/* 卡片瀑布容器 */
+.tn-panel-cards {
+  max-height: 360px;
+  overflow-y: auto;
+  margin-top: 10px;
+  padding-right: 2px;
+}
+
+.tn-panel-cards::-webkit-scrollbar {
+  width: 3px;
+}
+.tn-panel-cards::-webkit-scrollbar-thumb {
+  background: #E0E0E0;
+}
+
+/* ===== 滚动条 ===== */
+.tn-panel::-webkit-scrollbar {
+  width: 3px;
+}
+
+.tn-panel::-webkit-scrollbar-thumb {
+  background: #E5E5E5;
+}
+
+/* ============================================================
+   无障碍兜底：系统开启"减少动态效果"时关闭所有装饰动效
+   （content.css 与 render-cards.css / platform.css 同属一个页面文档，
+    一段全局 @media 即覆盖三文件所有动效；纯字面量不依赖 token）
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* 1) 关掉所有循环微动效 + 入场动画，只保留瞬时状态切换 */
+  .tn-trigger,
+  .tn-widget, .tn-widget-pill, .tn-widget-eye,
+  .tn-widget--idle .tn-widget-pill,
+  .tn-widget--checking .tn-widget-eye,
+  .tn-widget--ready .tn-widget-pill,
+  .tn-widget--catch .tn-widget-pill, .tn-widget--catch .tn-widget-eye,
+  .tn-widget-tip,
+  .tn-widget-progress-bar,
+  .tn-panel, .tn-panel-claim,
+  .tn-panel-eye,
+  .tn-panel-step, .tn-panel-step-icon,
+  .tn-panel-step-icon--active, .tn-panel-step-icon--active::after,
+  .tn-panel-explanation-body.tn-typing::after,
+  .tn-pbtn--loading .tn-pbtn-eye,
+  .tn-card, .tn-card--enter, .tn-card--active,
+  .tn-card--final, .tn-card--final.tn-card--active,
+  .tn-card--active::after, .tn-card--active:not(.tn-card--final)::after,
+  .tn-card-dot--error,
+  .tn-stagger,
+  .tn-chain-reveal, .tn-chain-reveal .tn-chain-num,
+  .tn-chain-reveal .tn-chain-title, .tn-chain-reveal .tn-chain-detail,
+  .tn-chain-reveal .tn-chain-text, .tn-chain-reveal .tn-chain-points,
+  .tn-verify-flip,
+  .tn-chain-caret, .tn-chain-toggle-hint,
+  .tn-dim-bar-fill, .tn-dim-bar-fill.is-settled,
+  .tn-vdist-bar-fill, .tn-vdist-bar-fill.is-settled,
+  .tn-er-bar, .tn-er-bar.is-settled,
+  .tn-card--final .tn-card-dot--final::after,
+  .tn-final-claim-tag--true, .tn-final-claim-tag--false, .tn-final-claim-tag--unverified {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  /* 2) 入场/错落元素强制给终态——否则关掉动画后会永久停在 opacity:0 不可见 */
+  .tn-card, .tn-card--enter, .tn-card--active,
+  .tn-stagger, .tn-panel-claim, .tn-panel,
+  .tn-chain-reveal, .tn-chain-reveal .tn-chain-num,
+  .tn-chain-reveal .tn-chain-title, .tn-chain-reveal .tn-chain-detail,
+  .tn-chain-reveal .tn-chain-text, .tn-chain-reveal .tn-chain-points,
+  .tn-verify-flip {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* 3) 横条：不强制 transform（JS 会无条件设 inline scaleX(真实比例)，
+        且上面已把 transition 压到 0.01ms，会瞬间到位——绝不能用 !important 覆盖成满格，
+        否则 reduce 模式下所有维度/概率/证据条都错误显示为 100%） */
+  /* 4) filter 明度流动归位 */
+  .tn-dim-bar-fill.is-settled, .tn-vdist-bar-fill.is-settled, .tn-er-bar.is-settled {
+    filter: none !important;
+  }
+}

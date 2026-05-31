@@ -1,0 +1,161 @@
+<!doctype html>
+<!-- TruthNote 真相公示墙（社会辟谣大厅）插件内打包版。
+     来源：demo舞台/公开辟谣大厅.html（公示墙 lane 主权·深色大屏版）。本副本：
+     ① MV3-CSP 适配：内联 <script> 拆到 piyao-board.js、内联 onsubmit 移 JS；内联 <style> 保留（MV3 允许）。
+     ② 视觉改造（2026-05-31）：从深色大屏 → 浅色检测仪版，贴 小T 主视觉（白底+黑结构+三判定色+方眼睛+2px直角+阿里普惠体）。
+     类名/id 与 piyao-board.js 严格对齐（只改样式值，不改结构/命名）。设置页隐私区「社会辟谣体系」用 chrome.tabs.create 打开本页。
+     注：路演大屏那份 demo舞台/公开辟谣大厅.html 仍是深色，未同步（不同场景：大屏=深色戏剧 / 插件内=浅色一致）。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TruthNote · 真相公示墙｜全民实时辟谣</title>
+<style>
+  :root{
+    --bg:#F5F5F5; --panel:#FFFFFF; --panel2:#FAFAFA; --line:#E5E5E5;
+    --txt:#000000; --dim:#666666; --faint:#999999;
+    --red:#F43939; --green:#3ECF72; --amber:#FFB020; --blue:#4A90D9;
+    --red-bg:#FDE8E8; --green-bg:#E8F8ED; --amber-bg:#FFF3DB; --blue-bg:#EAF2FB;
+    --green-ink:#1F9D52; --amber-ink:#A86A00; /* 白底上可读的深一档绿/琥珀（用于文字） */
+    --accent:#000000;  /* 小T 主色 = 黑（不是绿） */
+    --mono:"JetBrains Mono","Menlo",Consolas,monospace;
+    --radius:2px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:"Alibaba PuHuiTi","Source Han Sans","Microsoft YaHei",-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 22px 64px}
+
+  /* ── 顶栏 ── */
+  header{
+    display:flex;align-items:center;gap:16px;
+    padding:18px 22px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:5;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(6px);
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{display:flex;align-items:center;gap:5px}
+  .logo-eye{width:13px;height:13px;background:#000;display:block;animation:breathe 2s ease-in-out infinite}
+  .logo-eye:nth-child(2){animation-delay:.15s}
+  @keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.9)}}
+  .brand h1{font-size:17px;margin:0;letter-spacing:.5px;color:#000;font-weight:700}
+  .brand .sub{font-size:11px;color:var(--dim);margin-top:2px}
+  .live{margin-left:6px;display:flex;align-items:center;gap:7px;font-family:var(--mono);
+    font-size:12px;color:var(--red);border:1px solid rgba(244,57,57,.3);padding:4px 9px;border-radius:var(--radius)}
+  .live .dot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(244,57,57,.5)}70%{box-shadow:0 0 0 7px rgba(244,57,57,0)}100%{box-shadow:0 0 0 0 rgba(244,57,57,0)}}
+  .clock{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--dim)}
+
+  /* ── 统计条 ── */
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);margin:22px 0;border-radius:var(--radius);overflow:hidden}
+  .stat{background:var(--panel);padding:16px 18px}
+  .stat .n{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:.5px;color:#000}
+  .stat .l{font-size:12px;color:var(--dim);margin-top:4px}
+  .stat.red .n{color:var(--red)} .stat.amber .n{color:var(--amber-ink)}
+  .stat.green .n{color:var(--green-ink)} .stat.blue .n{color:var(--blue)}
+
+  /* ── 控制区 ── */
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-size:13px;color:var(--dim);border:1px solid var(--line);background:var(--panel);
+    padding:6px 12px;cursor:pointer;user-select:none;transition:.12s;border-radius:var(--radius)}
+  .chip:hover{color:var(--txt);border-color:var(--faint)}
+  .chip.on{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:600}
+  .submit{margin-left:auto;display:flex;gap:0;min-width:330px;flex:1;max-width:460px}
+  .submit input{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--txt);
+    padding:9px 12px;font-size:13px;outline:none;border-radius:var(--radius) 0 0 var(--radius)}
+  .submit input:focus{border-color:var(--accent)}
+  .submit button{background:var(--accent);color:#fff;border:none;padding:0 16px;font-weight:700;
+    cursor:pointer;font-size:13px;white-space:nowrap;border-radius:0 var(--radius) var(--radius) 0}
+
+  /* ── feed ── */
+  .feed-head{display:flex;align-items:center;gap:10px;margin:6px 0 12px;color:var(--dim);font-size:12px}
+  .feed-head .ln{flex:1;height:1px;background:var(--line)}
+  .card{display:flex;gap:0;border:1px solid var(--line);background:var(--panel);margin-bottom:10px;
+    overflow:hidden;animation:rise .35s ease;border-radius:var(--radius)}
+  @keyframes rise{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  .card.flash{animation:flash 1.6s ease}
+  @keyframes flash{0%{background:var(--green-bg)}100%{background:var(--panel)}}
+  .stamp{width:96px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;border-right:1px solid var(--line);background:var(--panel2);padding:10px 6px}
+  .stamp .big{font-size:20px;font-weight:800;letter-spacing:2px}
+  .stamp .conf{font-family:var(--mono);font-size:10px;color:var(--faint)}
+  .v-red .big{color:var(--red)} .v-green .big{color:var(--green-ink)}
+  .v-amber .big{color:var(--amber-ink)} .v-blue .big{color:var(--blue)}
+  .body{flex:1;padding:13px 16px;min-width:0}
+  .claim{font-size:15px;line-height:1.5;margin:0 0 9px;color:#000}
+  .meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px}
+  .cat{color:var(--dim);border:1px solid var(--line);padding:2px 8px;border-radius:var(--radius)}
+  .badge{padding:2px 9px;font-weight:600;font-size:12px;border-radius:var(--radius)}
+  .b-red{color:var(--red);background:var(--red-bg);border:1px solid rgba(244,57,57,.25)}
+  .b-green{color:var(--green-ink);background:var(--green-bg);border:1px solid rgba(62,207,114,.35)}
+  .b-amber{color:var(--amber-ink);background:var(--amber-bg);border:1px solid rgba(255,176,32,.4)}
+  .b-blue{color:var(--blue);background:var(--blue-bg);border:1px solid rgba(74,144,217,.25)}
+  .report{color:var(--red);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+  .heat{font-family:var(--mono);color:var(--amber-ink)}
+  .ago{margin-left:auto;color:var(--faint);font-family:var(--mono)}
+  .evi{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;display:none}
+  .evi.open{display:block}
+  .evi a{color:var(--blue);text-decoration:none;margin-right:14px}
+  .evi a:hover{text-decoration:underline}
+  .expand{cursor:pointer;color:var(--faint);font-size:12px;user-select:none;margin-top:11px}
+  .expand:hover{color:var(--txt)}
+
+  footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);
+    color:var(--faint);font-size:12px;line-height:1.7}
+  footer b{color:var(--dim)}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+    background:#000;border:1px solid #000;color:#fff;
+    padding:11px 18px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;transition:.3s;z-index:20;border-radius:var(--radius)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  .src-tag{font-size:11px;color:var(--faint);font-family:var(--mono)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true"><span class="logo-eye"></span><span class="logo-eye"></span></div>
+    <div>
+      <h1>小T · 真相公示墙</h1>
+      <div class="sub">全民实时辟谣 · 谣言公开化处置 · 高危自动上报国家平台</div>
+    </div>
+  </div>
+  <div class="live"><span class="dot"></span> LIVE 实时</div>
+  <div class="clock" id="clock">--:--:--</div>
+</header>
+
+<div class="wrap">
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="chips" id="chips"></div>
+    <form class="submit" id="submitForm">
+      <input id="submitInput" placeholder="我收到一条可疑信息… 提交后自动进入核查队列" maxlength="120" />
+      <button id="submitBtn" type="button">提交核查</button>
+    </form>
+  </div>
+
+  <div class="feed-head"><span id="feedCount">实时核查流</span><span class="ln"></span><span class="src-tag" id="dataSrc">数据源：种子样本</span></div>
+  <div id="feed"></div>
+
+  <footer>
+    本墙汇聚两路数据：<b>① 官方辟谣库</b>——已从中国互联网联合辟谣平台、科普中国、人民网求真等官方平台真实采集 <b>5000+ 条</b>已辟谣谣言（每条点开即官方原文）；<b>② 实时核查</b>——全国 <b>TruthNote</b> 插件用户的核查实时汇入。<br>
+    同一条谣言被越多人遇到，热度越高、越优先处置；判定为高危且热度突破阈值的，<b>自动整理成 schema.org ClaimReview 标准件上报国家辟谣平台</b>。<br>
+    刚发生、权威源尚未表态的事件进入「<b>待核实·未定论</b>」区，<b>不臆测真假</b>——三人成虎咬的就是没人公开说"未核实"那段空当，我们在所有人之前给它点一盏灯；权威结论出现后自动回填更新。<br>
+    <span class="src-tag">雏形说明：官方辟谣库与公示墙是真做出来的（可点）；"全国实时汇聚 + 官方平台真收录"是可达·可实现的设计，非"已上线全国"。</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="piyao-board.js"></script>
+</body>
+</html>

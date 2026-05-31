@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthNote — 闭环追踪</title>
+    <style>
+        :root {
+            --bg: #f5f7fa; --card: #fff; --primary: #2563eb; --primary-light: #dbeafe;
+            --danger: #dc2626; --danger-light: #fee2e2; --warn: #f59e0b; --warn-light: #fef3c7;
+            --success: #16a34a; --success-light: #dcfce7; --gray: #6b7280; --border: #e5e7eb;
+            --text: #1f2937; --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+        .top-nav { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--border); margin: -24px -16px 24px -16px; font-size: 0.85rem; }
+        .top-nav a { padding: 6px 14px; border-radius: 8px; text-decoration: none; color: var(--gray); font-weight: 500; transition: all 0.2s; }
+        .top-nav a:hover { background: var(--primary-light); color: var(--primary); }
+        .top-nav a.active { background: var(--primary); color: #fff; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header h1 { font-size: 1.4rem; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: var(--card); border-radius: var(--radius); padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .stat-card .number { font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-card .label { font-size: 0.8rem; color: var(--gray); margin-top: 4px; }
+
+        .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; }
+
+        /* 生命周期卡片 */
+        .lifecycle-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+        .lc-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .lc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .lc-msg { font-size: 0.9rem; flex: 1; margin-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .lc-meta { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+        /* 状态流水线 */
+        .pipeline { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 8px 0; }
+        .pipe-step { display: flex; flex-direction: column; align-items: center; min-width: 80px; position: relative; }
+        .pipe-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                    font-size: 0.7rem; font-weight: 700; color: #fff; transition: all 0.3s; }
+        .pipe-dot.done { background: var(--success); }
+        .pipe-dot.current { background: var(--primary); animation: pulse 1.5s infinite; }
+        .pipe-dot.pending { background: var(--border); color: var(--gray); }
+        .pipe-label { font-size: 0.65rem; color: var(--gray); margin-top: 4px; text-align: center; max-width: 80px; }
+        .pipe-arrow { width: 24px; height: 2px; background: var(--border); flex-shrink: 0; }
+        .pipe-arrow.done { background: var(--success); }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+        }
+
+        /* 风险标签 */
+        .risk-tag { padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+        .risk-high { background: var(--danger-light); color: var(--danger); }
+        .risk-medium { background: var(--warn-light); color: #92400e; }
+        .risk-low { background: var(--success-light); color: var(--success); }
+
+        .badge { padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .badge-false { background: var(--danger-light); color: var(--danger); }
+        .badge-true { background: var(--success-light); color: var(--success); }
+        .badge-warn { background: var(--warn-light); color: #92400e; }
+        .badge-gray { background: #f3f4f6; color: var(--gray); }
+
+        .intervention-tag { font-size: 0.7rem; padding: 2px 8px; background: var(--primary-light); color: var(--primary); border-radius: 6px; }
+
+        /* 案例列表 */
+        .case-list { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .case-list-header { padding: 16px; font-weight: 600; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .case-item { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .case-item:last-child { border-bottom: none; }
+        .case-item:hover { background: #f9fafb; }
+        .case-msg { font-size: 0.9rem; flex: 1; margin-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .case-meta { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .case-time { font-size: 0.75rem; color: var(--gray); }
+        .empty-state { padding: 48px; text-align: center; color: var(--gray); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="top-nav">
+        <a href="/">核查演示</a>
+        <a href="/dashboard" class="active">闭环追踪</a>
+        <a href="/benchmark">评测报告</a>
+    </nav>
+    <div class="header">
+        <h1>TruthNote — 闭环追踪</h1>
+        <span></span>
+    </div>
+
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="number" id="statCases">—</div><div class="label">核查案例</div></div>
+        <div class="stat-card"><div class="number" id="statMemories">—</div><div class="label">记忆库条目</div></div>
+        <div class="stat-card"><div class="number" id="statSources">—</div><div class="label">来源库</div></div>
+        <div class="stat-card"><div class="number" id="statFeedback">—</div><div class="label">用户反馈</div></div>
+    </div>
+
+    <div class="section-title">闭环状态追踪</div>
+    <div class="lifecycle-list" id="lifecycleList">
+        <div class="empty-state">暂无追踪记录</div>
+    </div>
+
+    <div class="section-title" style="margin-top:24px">正在追踪（等待发信人自纠）</div>
+    <div class="lifecycle-list" id="trackingList">
+        <div class="empty-state">无追踪中案例</div>
+    </div>
+
+    <div class="section-title" style="margin-top:24px">升级日志</div>
+    <div id="escalationLog" style="margin-bottom:24px;">
+        <div class="empty-state" style="background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">暂无升级记录</div>
+    </div>
+
+    <div class="section-title" style="margin-top:24px">历史案例</div>
+    <div class="case-list">
+        <div class="case-list-header">
+            <span>最近核查案件</span>
+            <span style="font-size:0.8rem;color:var(--gray)" id="caseCount"></span>
+        </div>
+        <div id="caseListBody"><div class="empty-state">暂无核查记录</div></div>
+    </div>
+</div>
+
+<script>
+const STATES = [
+    {key: 'detected', label: '检测'},
+    {key: 'extracted', label: '提取'},
+    {key: 'verified', label: '核查'},
+    {key: 'judged', label: '判定'},
+    {key: 'intervened', label: '干预'},
+    {key: 'tracking', label: '追踪'},
+    {key: 'escalated', label: '升级'},
+    {key: 'memorized', label: '记忆'},
+    {key: 'repeat_blocked', label: '秒拦'},
+];
+
+const VERDICT_BADGE = {
+    '谣言': 'badge-false', '大部分不实': 'badge-false',
+    '误导性信息': 'badge-warn', '部分属实': 'badge-warn',
+    '属实': 'badge-true', '无法核实': 'badge-gray',
+};
+
+const RISK_CLASS = { low: 'risk-low', medium: 'risk-medium', high: 'risk-high' };
+const RISK_LABEL = { low: '低风险', medium: '中风险', high: '高风险' };
+const INTERVENTION_LABEL = {
+    private_warn: '私聊提醒',
+    private_warn_timeout_group: '私聊+超时群发',
+    group_alert: '群内警告',
+    positive_confirm: '正向确认',
+};
+
+function renderPipeline(currentState, transitions) {
+    const reached = new Set();
+    (transitions || []).forEach(t => { reached.add(t.from_state); reached.add(t.to_state); });
+    reached.add(currentState);
+
+    let html = '';
+    STATES.forEach((s, i) => {
+        const isDone = reached.has(s.key) && s.key !== currentState;
+        const isCurrent = s.key === currentState;
+        const cls = isCurrent ? 'current' : isDone ? 'done' : 'pending';
+        const num = i + 1;
+        html += `<div class="pipe-step"><div class="pipe-dot ${cls}">${num}</div><div class="pipe-label">${s.label}</div></div>`;
+        if (i < STATES.length - 1) {
+            html += `<div class="pipe-arrow ${isDone ? 'done' : ''}"></div>`;
+        }
+    });
+    return html;
+}
+
+async function selfCorrect(caseId) {
+    await fetch('/api/self_correction', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({case_id:caseId})});
+    loadDashboard();
+}
+
+async function forceEscalation() {
+    const resp = await fetch('/api/check_escalations', {method:'POST'});
+    const data = await resp.json();
+    alert(`升级了 ${data.escalated_count} 条案例`);
+    loadDashboard();
+}
+
+async function loadDashboard() {
+    try {
+        const [statsResp, casesResp, lcResp, trackResp, escResp] = await Promise.all([
+            fetch('/api/stats'), fetch('/api/cases'), fetch('/api/lifecycles'),
+            fetch('/api/tracking'), fetch('/api/escalation_log'),
+        ]);
+        const stats = await statsResp.json();
+        const cases = await casesResp.json();
+        const lifecycles = await lcResp.json();
+        const tracking = await trackResp.json();
+        const escLog = await escResp.json();
+
+        document.getElementById('statCases').textContent = stats.total_cases;
+        document.getElementById('statMemories').textContent = stats.total_memories;
+        document.getElementById('statSources').textContent = stats.total_sources;
+        document.getElementById('statFeedback').textContent = stats.total_feedback;
+        document.getElementById('caseCount').textContent = `共 ${cases.length} 条`;
+
+        // 渲染生命周期
+        if (lifecycles.length > 0) {
+            document.getElementById('lifecycleList').innerHTML = lifecycles.map(lc => {
+                const verdictClass = VERDICT_BADGE[lc.overall_verdict] || 'badge-gray';
+                const riskClass = RISK_CLASS[lc.risk_level] || 'risk-medium';
+                const riskLabel = RISK_LABEL[lc.risk_level] || lc.risk_level;
+                const intLabel = INTERVENTION_LABEL[lc.intervention_type] || lc.intervention_type;
+                const msg = escHtml((lc.original_message || '').substring(0, 60));
+                return `<div class="lc-card">
+                    <div class="lc-header">
+                        <div class="lc-msg">${msg}</div>
+                        <div class="lc-meta">
+                            <span class="risk-tag ${riskClass}">${riskLabel}</span>
+                            <span class="intervention-tag">${intLabel}</span>
+                            <span class="badge ${verdictClass}">${lc.overall_verdict}</span>
+                        </div>
+                    </div>
+                    <div class="pipeline">${renderPipeline(lc.current_state, lc.transitions)}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // 渲染追踪中案例
+        if (tracking.length > 0) {
+            const now = Date.now() / 1000;
+            document.getElementById('trackingList').innerHTML = tracking.map(t => {
+                const msg = escHtml((t.original_message || '').substring(0, 50));
+                const deadline = t.escalation_deadline;
+                let countdownHtml = '';
+                if (deadline && deadline > now) {
+                    const remaining = Math.ceil(deadline - now);
+                    const min = Math.floor(remaining / 60);
+                    const sec = remaining % 60;
+                    countdownHtml = `<span style="color:var(--warn);font-weight:700;font-size:0.85rem;">⏱ ${min}:${String(sec).padStart(2,'0')} 后升级</span>`;
+                } else if (deadline && deadline <= now) {
+                    countdownHtml = `<span style="color:var(--danger);font-weight:700;font-size:0.85rem;">⚠ 已到期</span>`;
+                }
+                const script = escHtml(t.self_correction_script || '');
+                return `<div class="lc-card">
+                    <div class="lc-header">
+                        <div class="lc-msg">${msg}</div>
+                        <div class="lc-meta">
+                            ${countdownHtml}
+                            <button onclick="selfCorrect(${t.case_id})" style="padding:4px 12px;border:1px solid var(--success);color:var(--success);background:#fff;border-radius:8px;cursor:pointer;font-size:0.75rem;">✓ 已自纠</button>
+                        </div>
+                    </div>
+                    ${script ? `<div style="background:#f0fdf4;padding:8px 12px;border-radius:8px;font-size:0.8rem;color:#166534;margin-top:8px;">💬 预写自纠话术：${script}</div>` : ''}
+                </div>`;
+            }).join('') + `<div style="text-align:right;margin-top:8px;"><button onclick="forceEscalation()" style="padding:6px 16px;border:1px solid var(--danger);color:var(--danger);background:#fff;border-radius:8px;cursor:pointer;font-size:0.8rem;">⚡ 手动触发升级检查</button></div>`;
+        } else {
+            document.getElementById('trackingList').innerHTML = '<div class="empty-state">无追踪中案例</div>';
+        }
+
+        // 渲染升级日志
+        if (escLog.length > 0) {
+            document.getElementById('escalationLog').innerHTML = escLog.map(e => {
+                const msg = escHtml(e.message || '');
+                const escMsg = escHtml(e.escalation_message || '');
+                return `<div class="lc-card" style="border-left:3px solid var(--danger);">
+                    <div style="font-size:0.85rem;margin-bottom:6px;">📢 案例 #${e.case_id}：${msg}</div>
+                    <div style="background:var(--danger-light);padding:8px 12px;border-radius:8px;font-size:0.8rem;color:var(--danger);">群发消息：${escMsg}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // 渲染案例列表
+        if (cases.length > 0) {
+            document.getElementById('caseListBody').innerHTML = cases.map(c => {
+                const badgeClass = VERDICT_BADGE[c.overall_verdict] || 'badge-gray';
+                const t = new Date(c.created_at * 1000).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+                return `<div class="case-item">
+                    <div class="case-msg">${escHtml(c.original_message)}</div>
+                    <div class="case-meta">
+                        <span class="badge ${badgeClass}">${c.overall_verdict}</span>
+                        <span class="case-time">${t}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    } catch(e) { console.error(e); }
+}
+
+function escHtml(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+loadDashboard();
+setInterval(loadDashboard, 10000);
+</script>
+</body>
+</html>

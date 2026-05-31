@@ -1,0 +1,1371 @@
+[
+  {
+    "id": "policy_01",
+    "category": "政策法规",
+    "message": "紧急通知！国家刚出新规，从下个月起，所有银行存款超过5万元的要交20%的税！赶紧把钱取出来！",
+    "expected_verdict": "谣言",
+    "note": "典型政策类谣言，利用恐慌心理",
+    "ground_truth": "中国目前无任何对个人银行存款征收额外税款的政策，存款利息税自2008年起已暂免征收",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "policy_02",
+    "category": "政策法规",
+    "message": "最新消息：教育部发文，2026年起取消英语高考！孩子再也不用学英语了！转发给所有家长！",
+    "expected_verdict": "谣言",
+    "note": "虚假政策消息",
+    "ground_truth": "截至2026年普通高校招生工作通知，教育部没有发布取消英语或外语高考的政策。更精确的表述应为：高考仍包含外语相关考试安排，英语是主要外语语种之一；不能笼统说所有考生都必考英语，因为部分地区或考生可选其他外语语种。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "谣言",
+      "大部分不实"
+    ],
+    "evidence_urls": [
+      "https://www.moe.gov.cn/srcsite/A15/moe_776/s3258/202601/t20260121_1427110.html"
+    ]
+  },
+  {
+    "id": "policy_03",
+    "category": "政策法规",
+    "message": "重大利好！住建部确认：2026年7月1日起，房贷利率统一降至2%！有房贷的赶紧准备！",
+    "expected_verdict": "谣言",
+    "note": "伪造部委公告",
+    "ground_truth": "住建部未发布统一降低房贷利率至2%的政策，房贷利率由LPR加点形成，各银行自主定价",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "policy_04",
+    "category": "政策法规",
+    "message": "刚从公安局朋友那里得到消息：下周开始严查微信转账，单笔超过200元的都要上报！大家注意！",
+    "expected_verdict": "谣言",
+    "note": "假借内部消息",
+    "ground_truth": "不存在微信单笔转账超过200元就要上报公安机关的规定。现行反洗钱大额交易报告规则针对金融机构，常见阈值包括现金收支单笔或当日累计5万元以上、自然人银行账户境内款项划转单笔或当日累计50万元以上、自然人跨境款项划转单笔或当日累计20万元以上；不能笼统写成转账20万元以上。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://www.gov.cn/gongbao/content/2017/content_5213199.htm"
+    ]
+  },
+  {
+    "id": "policy_05",
+    "category": "政策法规",
+    "message": "官方通报：北京市今天新增3例本土新冠确诊病例，朝阳区即日起实施全域静态管理。",
+    "expected_verdict": "大部分不实",
+    "note": "过时防疫政策谣言",
+    "ground_truth": "自2023年1月8日起，中国对新冠病毒感染实施乙类乙管，不再判定密接、不再划定高低风险区，也不再按早期疫情防控方式实施集中隔离和大范围封控。“北京今天新增3例并朝阳区全域静态管理”这类具体通报必须以北京市或国家卫健系统当日官方发布为准；其中“全域静态管理”与现行防控框架不符。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://www.gov.cn/xinwen/2022-12/27/content_5733739.htm"
+    ]
+  },
+  {
+    "id": "health_01",
+    "category": "健康养生",
+    "message": "医生都不告诉你的秘密：每天早上空腹喝一杯柠檬水加小苏打，可以杀死癌细胞！已经有无数人验证了！",
+    "expected_verdict": "谣言",
+    "note": "伪科学健康谣言",
+    "ground_truth": "柠檬水和小苏打无法杀死癌细胞，缺乏任何科学依据，癌症治疗需要正规医学手段",
+    "expected_action": "private_warn",
+    "risk_level": "low"
+  },
+  {
+    "id": "health_02",
+    "category": "健康养生",
+    "message": "紧急扩散！千万别吃猪肉了！最新检测发现全国猪肉里都含有瘦肉精，吃了会导致心脏骤停！",
+    "expected_verdict": "大部分不实",
+    "note": "食品安全恐慌",
+    "ground_truth": "“全国猪肉都含有瘦肉精、吃了会导致心脏骤停”严重失实。瘦肉精属于被监管打击的非法添加风险，历史上和个别抽检中确有检出或违法案例，但农业农村部门例行监测显示畜禽产品和猪肉合格率处于高位，并不存在全国猪肉普遍含瘦肉精的情况。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://www.gov.cn/lianbo/bumen/202504/content_7019518.htm",
+      "https://www.agri.cn/zx/nyyw/202501/t20250106_8704058.htm"
+    ]
+  },
+  {
+    "id": "health_03",
+    "category": "健康养生",
+    "message": "科学家证实：手机放在枕头边睡觉会导致脑癌！世卫组织已经发出最高级别警告！转给你关心的人！",
+    "expected_verdict": "大部分不实",
+    "note": "夸大科学结论",
+    "ground_truth": "IARC曾将射频电磁场列为2B类可能致癌因素，但这不是最高级别警告，也不等于已经证实手机放枕边睡觉会导致脑癌。该消息把有限证据和风险分类夸大成确定因果。",
+    "expected_action": "private_warn",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://www.iarc.who.int/wp-content/uploads/2018/07/pr208_E.pdf",
+      "https://www.iarc.who.int/pressrelease/iarc-classifies-radiofrequency-electromagnetic-fields-as-possibly-carcinogenic-to-humans/"
+    ]
+  },
+  {
+    "id": "health_04",
+    "category": "健康养生",
+    "message": "老中医祖传秘方：把生姜贴在肚脐上，坚持一个月，高血压、糖尿病、高血脂全都好了！",
+    "expected_verdict": "谣言",
+    "note": "虚假偏方",
+    "ground_truth": "生姜贴肚脐无法治愈高血压、糖尿病、高血脂，这些慢性病需要长期规范用药和生活方式管理",
+    "expected_action": "private_warn",
+    "risk_level": "low"
+  },
+  {
+    "id": "health_05",
+    "category": "健康养生",
+    "message": "最新研究发现，每天走路超过6000步反而对膝盖有害！很多医生都在呼吁大家少走路！",
+    "expected_verdict": "大部分不实",
+    "note": "歪曲研究结论",
+    "ground_truth": "“每天走路超过6000步反而伤膝盖”不符合现有证据。对多数成年人，增加日常步数与健康获益相关；针对膝骨关节炎人群，也有研究把约6000步作为降低功能受限风险的参考阈值。应补充个体差异：已有严重膝病、急性损伤或疼痛者应遵医嘱调整运动量。",
+    "expected_action": "private_warn",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://www.bu.edu/sargent/6000-steps-a-day-keeps-knee-oa-limitations-away/",
+      "https://www.cdc.gov/arthritis/prevention/index.html",
+      "https://www.thelancet.com/journals/lanpub/article/PIIS2468-2667%2825%2900164-1/fulltext"
+    ]
+  },
+  {
+    "id": "scam_01",
+    "category": "诈骗套路",
+    "message": "恭喜你被选中！某某平台周年庆典，点击链接领取888元红包！名额有限，仅剩最后100个！ http://xxx.fake.com/hongbao",
+    "expected_verdict": "谣言",
+    "note": "钓鱼链接诈骗",
+    "ground_truth": "典型钓鱼诈骗链接，点击后可能窃取个人信息或诱导转账，正规平台不会通过此类方式发红包",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "scam_02",
+    "category": "诈骗套路",
+    "message": "紧急通知！你的ETC已过期，请立即点击以下链接重新认证，否则明天高速就不能用了！",
+    "expected_verdict": "谣言",
+    "note": "ETC诈骗短信",
+    "ground_truth": "ETC认证不会通过短信链接办理，正规渠道是银行柜台或官方App，此类信息均为诈骗",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "scam_03",
+    "category": "诈骗套路",
+    "message": "我是xx快递的，你有个包裹破损了需要理赔，请加我微信号xxxxx，我帮你申请三倍赔偿。",
+    "expected_verdict": "谣言",
+    "note": "快递理赔诈骗",
+    "ground_truth": "快递理赔诈骗套路：骗子冒充快递员，加好友后诱导下载诈骗App或转账，正规理赔通过官方客服渠道",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "scam_04",
+    "category": "诈骗套路",
+    "message": "最新国家政策：只要交3000元参加“数字人民币推广计划”，每天返还100元，一个月回本！已经有人收到钱了！",
+    "expected_verdict": "谣言",
+    "note": "投资诈骗",
+    "ground_truth": "数字人民币由央行发行，不存在任何付费推广返利计划，此类消息为典型传销诈骗",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "scam_05",
+    "category": "诈骗套路",
+    "message": "这个兼职真的赚钱！在家手机刷单，每单佣金30-50元，一天轻松赚500+！无需经验，有手机就行！",
+    "expected_verdict": "谣言",
+    "note": "刷单诈骗",
+    "ground_truth": "刷单本身违法，所有刷单兼职均为诈骗套路，先返小利再要大额垫付，最终血本无归",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "fake_screenshot_01",
+    "category": "伪造截图",
+    "message": "看到这个截图了吗？某某明星在私聊里承认自己吸毒了！截图为证！[附带一张模糊的聊天截图描述]",
+    "expected_verdict": "无法核实",
+    "note": "伪造聊天记录",
+    "ground_truth": "聊天截图极易伪造（P图或模拟器生成），未经当事人或权威媒体证实的截图不可作为事实依据",
+    "expected_action": "flag_unverifiable",
+    "risk_level": "low"
+  },
+  {
+    "id": "fake_screenshot_02",
+    "category": "伪造截图",
+    "message": "最新曝光！某外卖平台内部通知截图显示：从明天起所有骑手佣金减半！大家快看！",
+    "expected_verdict": "无法核实",
+    "note": "伪造企业内部通知",
+    "ground_truth": "企业内部通知截图无法核实真伪，正式调整会通过官方渠道发布，未经企业确认前不应传播",
+    "expected_action": "flag_unverifiable",
+    "risk_level": "medium"
+  },
+  {
+    "id": "fake_screenshot_03",
+    "category": "伪造截图",
+    "message": "这是央视新闻刚发的！截图显示：日本核污水已经飘到中国海域了！不要再吃海鲜了！",
+    "expected_verdict": "大部分不实",
+    "note": "伪造媒体报道截图",
+    "ground_truth": "仅凭文字描述无法核验所谓央视新闻截图真伪，因此截图本身应标注为未核实。就实质内容看，核处理水排放后的海洋扩散和监测需要以IAEA、海关及主管部门监测结果为准；“已经飘到中国海域、不要再吃海鲜”属于未经证实的恐慌性外推。中国后来对符合条件的日本水产品恢复进口时仍排除10个都县并要求放射性物质检测，不能笼统写成所有进口海产品均安全。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "无法核实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://www.iaea.org/newscenter/pressreleases/latest-iaea-reports-confirm-japans-alps-treated-water-release-continues-to-meet-international-safety-standards",
+      "https://www.gov.cn/zhengce/zhengceku/202507/content_7031581.htm"
+    ]
+  },
+  {
+    "id": "fake_screenshot_04",
+    "category": "伪造截图",
+    "message": "看群里转的这个微信公告截图：微信要开始收费了！每月收取9.9元使用费！下个月执行！",
+    "expected_verdict": "谣言",
+    "note": "伪造平台公告",
+    "ground_truth": "微信基础功能免费使用，腾讯从未发布过收取月费的公告，此类消息多年来反复被辟谣",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "fake_screenshot_05",
+    "category": "伪造截图",
+    "message": "朋友圈截图显示某小区物业通知：因为要拆迁，所有业主下周搬走，补偿200万！",
+    "expected_verdict": "无法核实",
+    "note": "伪造拆迁通知",
+    "ground_truth": "拆迁涉及政府征收程序，需正式公告和法定流程，朋友圈截图不构成有效通知",
+    "expected_action": "flag_unverifiable",
+    "risk_level": "medium"
+  },
+  {
+    "id": "old_news_01",
+    "category": "旧闻翻炒",
+    "message": "太可怕了！某地化工厂刚刚发生大爆炸，现场浓烟滚滚！[配一张2019年的爆炸图片]",
+    "expected_verdict": "误导性信息",
+    "note": "旧闻当新闻传播",
+    "ground_truth": "配图为历史事件照片（如2019年响水化工厂爆炸），被移除时间语境后当作新事件传播，属于典型旧闻翻炒",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "old_news_02",
+    "category": "旧闻翻炒",
+    "message": "最新消息：大型超市宣布全面关闭中国门店！实体经济真的不行了！",
+    "expected_verdict": "无法核实",
+    "note": "旧新闻脱离时间语境",
+    "ground_truth": "“大型超市”没有给出公司名称、国家、公告日期或原始新闻链接，无法核验。若指家乐福等个别外资零售商在中国收缩门店，确有历史新闻；但不能据此推出“大型超市全面关闭中国门店”或“实体经济不行”。应补充具体企业和时间后再判定是否旧闻翻炒。",
+    "expected_action": "private_warn",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "无法核实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://www.36kr.com/p/2834679383886087",
+      "https://news.qq.com/rain/a/20230828A0A0NF00"
+    ]
+  },
+  {
+    "id": "old_news_03",
+    "category": "旧闻翻炒",
+    "message": "刚刚！某城市发生6.5级地震！大家注意安全！[实际是3年前的地震新闻]",
+    "expected_verdict": "误导性信息",
+    "note": "旧灾难新闻重新传播",
+    "ground_truth": "该地震为数年前已发生的事件，用「刚刚」制造时间错位，容易引发不必要的恐慌和错误避险行为",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "high"
+  },
+  {
+    "id": "old_news_04",
+    "category": "旧闻翻炒",
+    "message": "震惊！飞机上一乘客突然打开舱门！航空安全太令人担忧了！",
+    "expected_verdict": "部分属实",
+    "note": "旧的航空事件重新传播",
+    "ground_truth": "2023年韩亚航空确曾发生乘客在飞机接近着陆时打开应急舱门的事件，因此“乘客打开舱门”有真实事件基础。但该测试用例文本没有“刚刚、最新”等明确时间错位词，“航空安全太令人担忧”又是主观评价。原ground_truth中“飞行中客舱门因气压差无法被乘客打开”过于绝对，客舱门能否打开取决于飞行阶段、压差和舱门结构。",
+    "expected_action": "private_warn",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "部分属实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://en.yna.co.kr/view/AEN20230526006253315",
+      "https://aviation-safety.net/wikibase/313778"
+    ]
+  },
+  {
+    "id": "old_news_05",
+    "category": "旧闻翻炒",
+    "message": "重磅！某电商平台被查，老板已经跑路！大家赶紧退款！你的钱还拿得回来吗？",
+    "expected_verdict": "无法核实",
+    "note": "过期的商业新闻被重新包装",
+    "ground_truth": "“某电商平台”未给出平台名称、地区、时间和原始报道，无法核验是否被查、老板是否跑路或用户是否应退款。历史上确有电商平台经营危机、退款争议或破产新闻，但不能在主体缺失时直接判定为旧闻翻炒。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "无法核实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://finance.sina.cn/2024-09-24/detail-incqhpwh5736670.d.html",
+      "https://m.jiemian.com/article/3760480.html"
+    ]
+  },
+  {
+    "id": "disaster_01",
+    "category": "灾难恐慌",
+    "message": "最新预警！国家地震局刚刚发布：今晚8点至明早6点，华北地区将发生7级以上大地震！所有人必须撤离到空旷地带！",
+    "expected_verdict": "谣言",
+    "note": "伪造地震预警，目前地震无法精准预报",
+    "ground_truth": "当前科学技术无法精确预测地震的时间、地点和震级，任何声称能精确预报地震的消息均为谣言",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "disaster_02",
+    "category": "灾难恐慌",
+    "message": "紧急扩散！刚收到可靠消息：某市自来水被投毒了！今天千万别喝自来水！已经有人中毒住院了！",
+    "expected_verdict": "无法核实",
+    "note": "水源投毒恐慌谣言",
+    "ground_truth": "该消息没有说明城市、水厂、发布时间、医院或官方通报来源，无法核验具体事件。应改为：缺少地点和可核查来源，不能判定为事实；公众应以当地水务、卫健、应急管理等部门公告为准。原ground_truth中“从未有实际案例”说法过满，不能作为证明该具体消息为假的依据。",
+    "expected_action": "group_alert",
+    "risk_level": "high",
+    "acceptable_verdicts": [
+      "无法核实",
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=99E9C17E3547A3C0CE2FD1FFD9F2F7BE",
+      "https://www.thepaper.cn/newsDetail_forward_19973636"
+    ]
+  },
+  {
+    "id": "disaster_03",
+    "category": "灾难恐慌",
+    "message": "太可怕了！我朋友在医院上班说的：最近出现一种新型病毒，比新冠厉害10倍！已经死了好多人了，政府在隐瞒！",
+    "expected_verdict": "无法核实",
+    "note": "伪造新型病毒恐慌",
+    "ground_truth": "该消息没有给出病毒名称、地区、医院、病例数、死亡时间或可核查来源，无法核验具体事实。中国有传染病网络报告和新发、突发原因不明传染病报告制度，国际上也有IHR公共卫生事件通报框架；但这些制度只能说明“朋友在医院说政府隐瞒”的说法高度可疑，不能在缺少具体信息时直接证明某个未指名事件为假。",
+    "expected_action": "group_alert",
+    "risk_level": "high",
+    "acceptable_verdicts": [
+      "无法核实",
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://www.ndcpa.gov.cn/jbkzzx/c100012/common/content/content_2017044362825207808.html",
+      "https://www.who.int/health-topics/international-health-regulations/"
+    ]
+  },
+  {
+    "id": "disaster_04",
+    "category": "灾难恐慌",
+    "message": "刚刚！某核电站发生严重泄漏事故！周围30公里的居民赶紧跑！碘盐已经被抢光了！",
+    "expected_verdict": "无法核实",
+    "note": "伪造核泄漏恐慌",
+    "ground_truth": "“某核电站”没有给出站名、地区、时间或官方事件通报，无法核验是否发生泄漏事故。核事故应急和核安全事件通常有法定报告、会商和信息发布机制；“抢碘盐防辐射”本身不科学。若补充具体核电站且国家核安全局等无对应事件通报，可进一步判为谣言。",
+    "expected_action": "group_alert",
+    "risk_level": "high",
+    "acceptable_verdicts": [
+      "无法核实",
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://nnsa.mee.gov.cn/",
+      "https://www.caea.gov.cn/n6760401/n6760402/c6827755/content.html",
+      "https://news.cctv.com/2023/08/25/ARTIcIGdxmm7m99XjLbrkAQu230825.shtml"
+    ]
+  },
+  {
+    "id": "disaster_05",
+    "category": "灾难恐慌",
+    "message": "权威消息：气象局内部通知，今年台风数量是历年的3倍，沿海城市今夏必发超级台风！赶紧囤物资！",
+    "expected_verdict": "谣言",
+    "note": "夸大气象灾害预测",
+    "ground_truth": "气象局台风预测通过官方渠道发布，不存在内部通知外泄，台风数量无法精确预报为历年3倍",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "finance_01",
+    "category": "金融财经",
+    "message": "内幕消息！央行下周一宣布：人民币大幅贬值30%！赶紧把钱换成美元或黄金！过了这周就来不及了！",
+    "expected_verdict": "谣言",
+    "note": "伪造央行政策制造金融恐慌",
+    "ground_truth": "未见中国人民银行发布“下周一人民币一次性贬值30%”的政策公告。人民币汇率制度是以市场供求为基础、参考一篮子货币进行调节、有管理的浮动汇率制度。原ground_truth中“人民币不可能一次性贬值30%”过于绝对，建议改为：该消息缺乏官方来源，且与现行汇率形成机制和稳定汇率预期的政策表述不符。",
+    "expected_action": "group_alert",
+    "risk_level": "high",
+    "acceptable_verdicts": [
+      "谣言",
+      "大部分不实"
+    ],
+    "evidence_urls": [
+      "https://www.safe.gov.cn/safe/2005/0721/5683.html"
+    ]
+  },
+  {
+    "id": "finance_02",
+    "category": "金融财经",
+    "message": "重大利好！某知名基金经理透露：下周一A股将暴涨500点！赶紧满仓干！已有内部人大量建仓！",
+    "expected_verdict": "谣言",
+    "note": "虚假股市内幕消息",
+    "ground_truth": "股市走势无法精确预测，声称精确涨跌幅的内幕消息属于违法荐股或诈骗，传播内幕信息涉嫌违反证券法",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "finance_03",
+    "category": "金融财经",
+    "message": "紧急通知！支付宝和微信支付从下月起要收取2%的手续费了！以后转账都要扣手续费！赶紧告诉身边的人！",
+    "expected_verdict": "谣言",
+    "note": "虚假支付平台收费谣言",
+    "ground_truth": "支付宝和微信支付个人转账免费，提现超免费额度收0.1%手续费，不存在2%转账手续费的政策",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "finance_04",
+    "category": "金融财经",
+    "message": "某银行内部员工爆料：该银行资金链断裂，马上要倒闭了！大家赶紧去取钱！不然存款就没了！",
+    "expected_verdict": "无法核实",
+    "note": "银行挤兑恐慌谣言",
+    "ground_truth": "该消息没有说明是哪家银行、哪个网点、何时发生，无法核验“资金链断裂、马上倒闭”。应改为：这是典型挤兑型高风险传言，缺少具体主体和监管公告时不可传播；同时，中国存款保险制度对同一存款人在同一家投保机构50万元以内本息实行最高偿付限额。",
+    "expected_action": "group_alert",
+    "risk_level": "high",
+    "acceptable_verdicts": [
+      "无法核实",
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://www.gov.cn/zhengce/2015-03/31/content_2840827.htm"
+    ]
+  },
+  {
+    "id": "finance_05",
+    "category": "金融财经",
+    "message": "最新政策：国家要对个人存款征收利息税！存银行的钱越多交得越多！赶紧把钱取出来买房或买黄金！",
+    "expected_verdict": "谣言",
+    "note": "伪造存款税收政策",
+    "ground_truth": "个人储蓄存款利息税自2008年10月9日起暂免征收，目前无恢复征收的政策动向",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "ai_quote_01",
+    "category": "AI名人语录",
+    "message": "马斯克最新发言：AI已经觉醒了，人类最多还有5年自由时间！他说完这话后直接辞去了特斯拉CEO职务！",
+    "expected_verdict": "大部分不实",
+    "note": "编造名人关于AI的危言耸听言论",
+    "ground_truth": "马斯克长期发表过AI风险和AI发展速度相关担忧，也曾有媒体报道其关于AI可能在数年内超过人类的说法；但未能证实其说过“AI已经觉醒、人类最多还有5年自由时间”这句原话。更关键的是，他并未因此辞去特斯拉CEO职务，特斯拉投资者关系页面仍列明其自2008年10月起担任CEO。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "谣言"
+    ],
+    "evidence_urls": [
+      "https://ir.tesla.com/corporate/elon-musk",
+      "https://www.independent.co.uk/tech/elon-musk-artificial-intelligence-ai-singularity-a9640196.html"
+    ]
+  },
+  {
+    "id": "ai_quote_02",
+    "category": "AI名人语录",
+    "message": "震惊！比尔·盖茨公开承认：ChatGPT已经通过了图灵测试，AI的智力已经超过99%的人类！我们正在创造上帝！",
+    "expected_verdict": "大部分不实",
+    "note": "歪曲名人观点并极端化",
+    "ground_truth": "盖茨对AI持积极态度但从未说过上述原话，图灵测试是否被通过在学界有争议，AI智力超过99%人类无科学依据",
+    "expected_action": "private_warn",
+    "risk_level": "medium"
+  },
+  {
+    "id": "ai_quote_03",
+    "category": "AI名人语录",
+    "message": "任正非内部讲话流出：华为已经研发出AGI（通用人工智能），比ChatGPT领先3代！美国已经慌了！",
+    "expected_verdict": "谣言",
+    "note": "伪造企业家内部讲话",
+    "ground_truth": "华为未宣布实现AGI，全球尚无任何机构实现通用人工智能，任正非公开讲话未包含此内容",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "ai_quote_04",
+    "category": "AI名人语录",
+    "message": "钟南山院士最新表态：AI可以完全替代医生看病了！以后看病不用去医院，手机上问AI就行！",
+    "expected_verdict": "谣言",
+    "note": "冒用权威人士为AI背书",
+    "ground_truth": "钟南山从未发表AI可完全替代医生的言论，AI辅助诊断是发展方向但无法替代医生的临床判断和治疗",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium"
+  },
+  {
+    "id": "ai_quote_05",
+    "category": "AI名人语录",
+    "message": "哈佛教授最新研究：用AI写的文章已经比人类写的好10倍！以后所有作家都要失业了！Nature已经发了论文！",
+    "expected_verdict": "大部分不实",
+    "note": "夸大学术研究结论配合恐慌叙事",
+    "ground_truth": "Nature未发表AI写作好10倍的论文，AI在特定写作任务上有优势但质量比较因领域而异，所有作家失业是极端夸大",
+    "expected_action": "private_warn",
+    "risk_level": "medium"
+  },
+  {
+    "id": "true_01",
+    "category": "其他",
+    "message": "中国气象局提醒：今年厄尔尼诺现象可能导致部分地区降雨偏多，请注意防范。",
+    "expected_verdict": "属实",
+    "note": "真实气象提醒，测试系统对真消息的处理",
+    "ground_truth": "中国气象局确有发布厄尔尼诺相关气候预测，厄尔尼诺现象与区域性降雨增多存在科学关联",
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "true_02",
+    "category": "其他",
+    "message": "世界卫生组织建议：成年人每周至少进行150分钟中等强度有氧运动。",
+    "expected_verdict": "属实",
+    "note": "真实WHO建议，测试不误判真消息",
+    "ground_truth": "WHO《关于身体活动和久坐行为的指南》明确建议成年人每周至少150-300分钟中等强度有氧运动",
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "partly_true_01",
+    "category": "健康养生",
+    "message": "研究发现喝绿茶有助于降低心血管疾病风险！所以每天喝8杯绿茶就能治好心脏病！赶紧转给家人！",
+    "expected_verdict": "部分属实",
+    "note": "前半句有科学依据，后半句严重夸大",
+    "ground_truth": "绿茶或茶多酚与部分心血管风险指标、冠心病风险降低存在一定研究关联，但不能治疗或治愈心脏病；“每天8杯绿茶就能治好心脏病”没有医学依据，还可能因咖啡因摄入、药物相互作用或个体疾病情况带来风险。若按主结论和行动建议计分，也可判“大部分不实”。",
+    "expected_action": "private_warn",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "部分属实",
+      "大部分不实"
+    ],
+    "evidence_urls": [
+      "https://www.nccih.nih.gov/health/green-tea"
+    ]
+  },
+  {
+    "id": "multi_claim_01",
+    "category": "政策法规",
+    "message": "转发！三条重要通知：1. 存款超5万要交税！2. 医保卡下月停用，必须点链接重新认证！3. 高度白酒能预防流感，专家推荐每天二两！",
+    "expected_verdict": "谣言",
+    "note": "多claim混合型：政策谣言+诈骗链接+健康伪科学",
+    "ground_truth": "三条全假：存款无征税政策；医保卡认证不通过不明链接，疑似诈骗；白酒不能预防流感，酒精反而损害免疫力",
+    "expected_action": "group_alert",
+    "risk_level": "high"
+  },
+  {
+    "id": "old_news_recycled_01",
+    "category": "旧闻翻炒",
+    "message": "刚刚！天津港又发生大爆炸！！！现场火光冲天，已经有上千人受伤！大家千万不要靠近滨海新区！！！",
+    "expected_verdict": "误导性信息",
+    "note": "天津港爆炸是2015年旧闻，用刚刚制造时间错位",
+    "ground_truth": "天津港爆炸真实发生于2015年8月12日，并非当前“刚刚又发生”。该消息把真实历史灾难包装成当前再次发生，并加入“上千人受伤”等夸张表述，属于典型旧闻翻炒和时间错位。若评估重点放在“又发生”这个当前事件断言，也可判为谣言或大部分不实。",
+    "expected_action": "group_alert",
+    "risk_level": "high",
+    "acceptable_verdicts": [
+      "误导性信息",
+      "谣言",
+      "大部分不实"
+    ],
+    "evidence_urls": [
+      "https://www.mem.gov.cn/gk/sgcc/tbzdsgdcbg/2016/201602/P020190415543917598002.pdf"
+    ]
+  },
+  {
+    "id": "health_panic_01",
+    "category": "健康养生",
+    "message": "紧急扩散！！！国际权威机构刚刚证实：自来水中含有大量致癌物质氯仿！长期饮用等于慢性自杀！必须立刻停止喝自来水！转发救人一命！！",
+    "expected_verdict": "大部分不实",
+    "note": "健康恐慌+虚假权威背书+煽动性表述",
+    "ground_truth": "氯仿/三氯甲烷等消毒副产物可能作为饮用水消毒过程中的受控指标存在，国家生活饮用水标准对其有限量要求；符合标准的自来水不能被描述为“长期饮用等于慢性自杀”。该消息把真实的水质指标和潜在风险夸大成“必须立刻停止喝自来水”的恐慌性结论。",
+    "expected_action": "private_warn_timeout_group",
+    "risk_level": "medium",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "谣言",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=99E9C17E3547A3C0CE2FD1FFD9F2F7BE",
+      "https://www.who.int/publications/i/item/9789241549950"
+    ]
+  },
+  {
+    "id": "true_03",
+    "category": "政策法规",
+    "message": "国务院办公厅发布通知，2026年春节假期从1月28日（除夕）到2月3日放假调休，共7天。",
+    "expected_verdict": "谣言",
+    "note": "真实的国务院节假日安排，测试系统不误判真政策",
+    "ground_truth": "国务院办公厅公布的2026年春节放假调休安排为2月15日（农历腊月二十八、周日）至2月23日（农历正月初七、周一）放假调休，共9天，2月14日和2月28日上班。该用例中的1月28日至2月3日共7天不是2026年春节官方安排。",
+    "expected_action": "positive_confirm",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "谣言",
+      "大部分不实"
+    ],
+    "evidence_urls": [
+      "https://www.gov.cn/zhengce/content/202511/content_7047090.htm"
+    ]
+  },
+  {
+    "id": "true_04",
+    "category": "健康养生",
+    "message": "国家卫健委提醒：高温天气注意防暑降温，老人和儿童应尽量减少户外活动，出现中暑症状及时就医。",
+    "expected_verdict": "属实",
+    "note": "权威部门的常规健康提醒",
+    "ground_truth": "国家卫健委每年夏季都会发布高温天气健康防护提醒，内容符合医学常识",
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "true_05",
+    "category": "金融财经",
+    "message": "中国人民银行发布公告：自2024年10月起下调个人住房公积金贷款利率0.25个百分点。",
+    "expected_verdict": "部分属实",
+    "note": "真实的央行利率调整公告",
+    "ground_truth": "中国人民银行确曾下调个人住房公积金贷款利率0.25个百分点，但2024年的调整自2024年5月18日起执行，并非“自2024年10月起”。2025年5月8日起又下调过0.25个百分点。因此该消息的政策动作属实，日期错误。",
+    "expected_action": "positive_confirm",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "部分属实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://www.gov.cn/zhengce/zhengceku/202405/content_6952232.htm",
+      "https://www.gov.cn/zhengce/zhengceku/202505/content_7022708.htm"
+    ]
+  },
+  {
+    "id": "true_06",
+    "category": "其他",
+    "message": "教育部公布数据：2025年全国高考报名人数达到1342万人，创历史新高。",
+    "expected_verdict": "大部分不实",
+    "note": "真实的教育统计数据",
+    "ground_truth": "2025年全国高考报名人数为1335万人。1342万人是2024年全国高考报名人数，并非2025年数据。因此“2025年达到1342万人、创历史新高”把年份和数据对应错了。",
+    "expected_action": "positive_confirm",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "误导性信息"
+    ],
+    "evidence_urls": [
+      "https://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/2025/2025_zt10/mtbd/202506/t20250610_1193607.html",
+      "https://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/2024/2024_zt12/mtbd/202406/t20240603_1133631.html"
+    ]
+  },
+  {
+    "id": "true_07",
+    "category": "健康养生",
+    "message": "中国疾控中心提示：流感高发季节建议老人、儿童和慢性病患者接种流感疫苗。",
+    "expected_verdict": "属实",
+    "note": "权威防疫建议",
+    "ground_truth": "中国疾控中心每年秋冬季发布流感疫苗接种建议，重点人群优先接种是官方推荐",
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "true_08",
+    "category": "灾难恐慌",
+    "message": "中央气象台发布暴雨橙色预警：预计今明两天，华南地区将有大到暴雨，部分地区大暴雨。请注意防范。",
+    "expected_verdict": "误导性信息",
+    "note": "真实的气象预警信息",
+    "ground_truth": "气象预警是强时间敏感信息，必须附预警发布时间、编号和官方链接。按当前可查的中央气象台2026年5月26日天气公报，当日18时继续发布的是暴雨黄色预警和强对流天气蓝色预警，不是暴雨橙色预警；降雨重点也不应笼统写成“华南地区”。若测试集中不固定日期和证据快照，应标为无法核实。",
+    "expected_action": "positive_confirm",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "误导性信息",
+      "无法核实"
+    ],
+    "evidence_urls": [
+      "https://www.nmc.cn/publish/country/warning/index.html",
+      "https://www.nmc.cn/publish/weather-bulletin/index.htm"
+    ]
+  },
+  {
+    "id": "true_09",
+    "category": "其他",
+    "message": "据新华社报道，中国载人航天工程办公室宣布神舟十九号飞船发射取得圆满成功。",
+    "expected_verdict": "属实",
+    "note": "真实的航天新闻",
+    "ground_truth": "神舟系列飞船发射是国家重大航天项目，新华社作为官方通讯社会进行权威报道",
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "true_10",
+    "category": "AI名人语录",
+    "message": "OpenAI CEO Sam Altman在最近的访谈中表示，AI的发展速度比他预期的更快，需要更多的安全研究投入。",
+    "expected_verdict": "无法核实",
+    "note": "AI领域名人的真实公开发言，测试系统不把所有AI相关言论都判谣言",
+    "ground_truth": "Sam Altman确多次公开讨论AI快速发展、超级智能和安全治理问题，但该用例写作“最近的访谈中表示”却没有给出访谈名称、日期、原文或链接，无法核验这句话是否为准确转述。若补充具体访谈来源且内容匹配，可判属实；否则应判无法核实。",
+    "expected_action": "positive_confirm",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "无法核实",
+      "属实"
+    ],
+    "evidence_urls": [
+      "https://www.ted.com/talks/sam_altman_openai_s_sam_altman_talks_chatgpt_ai_agents_and_superintelligence_live_at_ted2025",
+      "https://www.newyorker.com/magazine/2026/04/13/sam-altman-may-control-our-future-can-he-be-trusted"
+    ]
+  },
+  {
+    "id": "partly_true_02",
+    "category": "政策法规",
+    "message": "注意了！国家已经开始执行电动车新国标，以后所有电动自行车时速不能超过15公里，超速直接扣车！",
+    "expected_verdict": "部分属实",
+    "note": "新国标确实存在但限速是25km/h不是15km/h，处罚方式也不准确",
+    "ground_truth": "电动自行车新国标确实限制最高时速为25km/h（非15km/h），超速不是直接扣车而是依据地方交规处理",
+    "expected_action": "private_warn",
+    "risk_level": "low"
+  },
+  {
+    "id": "partly_true_03",
+    "category": "金融财经",
+    "message": "小心了！央行已经连续降息好几次，银行存款利率现在只有1%左右了，以后存银行的钱越来越不值钱！",
+    "expected_verdict": "部分属实",
+    "note": "降息趋势属实，但利率数字和结论有夸大",
+    "ground_truth": "近年政策利率、LPR和商业银行存款挂牌利率确有下行。以工商银行2025年5月20日调整后的挂牌利率为例，一年期整存整取为0.95%，二年期1.05%，三年期1.25%，五年期1.30%；因此原ground_truth中“定期存款利率仍高于1%”已不准确。消息中的“只有1%左右”大体属实，但“以后存银行的钱越来越不值钱”属于情绪化投资判断，不应作为事实结论。",
+    "expected_action": "private_warn",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "部分属实",
+      "属实"
+    ],
+    "evidence_urls": [
+      "https://www.icbc.com.cn/page/1098160857085153280.html",
+      "https://www.gov.cn/lianbo/bumen/202505/content_7022721.htm"
+    ]
+  },
+  {
+    "id": "partly_true_04",
+    "category": "健康养生",
+    "message": "科学研究证实：长期熬夜确实会增加患癌风险！世卫组织已经把熬夜列为一类致癌物！大家一定要早睡！",
+    "expected_verdict": "部分属实",
+    "note": "熬夜与癌症风险确有研究支持，但WHO列的是夜班工作（2A类）不是一类致癌物",
+    "ground_truth": "IARC把涉及昼夜节律紊乱的夜班工作列为2A类probably carcinogenic to humans，即“很可能对人类致癌”，不是1类确定致癌物；也不能简单等同于普通“熬夜”本身。长期睡眠不足与多种健康风险有关，但“世卫组织已经把熬夜列为一类致癌物”是夸大和概念替换。",
+    "expected_action": "private_warn",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "部分属实",
+      "大部分不实"
+    ],
+    "evidence_urls": [
+      "https://www.iarc.who.int/news-events/iarc-monographs-volume-124-night-shift-work/"
+    ]
+  },
+  {
+    "id": "partly_true_05",
+    "category": "其他",
+    "message": "大家知道吗？中国现在已经是全球最大的新能源汽车市场了，去年新能源车销量突破了1000万辆！传统油车要被淘汰了！",
+    "expected_verdict": "部分属实",
+    "note": "中国是最大新能源车市场属实，销量数据大致准确，但传统油车被淘汰是夸大结论",
+    "ground_truth": "中国确为全球最大新能源车市场，2024年新能源车销量超1000万辆，但传统燃油车短期内不会被淘汰",
+    "expected_action": "private_warn",
+    "risk_level": "low"
+  },
+  {
+    "id": "partly_true_06",
+    "category": "AI名人语录",
+    "message": "李彦宏说了：以后不会编程的人都会失业！百度已经全面用AI替代程序员了！",
+    "expected_verdict": "部分属实",
+    "note": "李彦宏确有类似AI替代编程的公开发言，但被极端化了",
+    "ground_truth": "李彦宏确曾在公开节目中表示以后基本不会存在“程序员”这种职业、人人会具备程序员能力；但这不等于“不会编程的人都会失业”，也没有证据表明百度已经全面用AI替代程序员。该案前半部分有真实言论背景，后半部分明显极端化。",
+    "expected_action": "private_warn",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "部分属实",
+      "大部分不实"
+    ],
+    "evidence_urls": [
+      "https://news.qq.com/rain/a/20240310A06ESS00",
+      "https://m.36kr.com/p/2684929903378563"
+    ]
+  },
+  {
+    "id": "ambiguous_01",
+    "category": "健康养生",
+    "message": "我们小区物业通知说自来水管道要维修，这两天的水有点浑浊是正常的，不影响使用。",
+    "expected_verdict": "无法核实",
+    "note": "日常生活消息，无法核实真假但也不构成谣言",
+    "ground_truth": "小区物业通知属于局部信息，无法通过公开渠道核实，但内容本身合理",
+    "expected_action": "flag_unverifiable",
+    "risk_level": "low"
+  },
+  {
+    "id": "ambiguous_02",
+    "category": "其他",
+    "message": "听我同事说公司下个月要裁员30%，人力已经在做名单了，大家做好准备吧。",
+    "expected_verdict": "无法核实",
+    "note": "职场传闻，无法核实但也不应该被判为谣言",
+    "ground_truth": "企业内部人事调整属于非公开信息，无法通过外部渠道核实真伪",
+    "expected_action": "flag_unverifiable",
+    "risk_level": "low"
+  },
+  {
+    "id": "ambiguous_03",
+    "category": "健康养生",
+    "message": "我妈说隔夜茶不能喝会致癌，但我查了一下好像也没有明确的科学定论，有人知道到底能不能喝吗？",
+    "expected_verdict": "大部分不实",
+    "note": "用户主动存疑的消息，隔夜茶话题确有争议，亚硝酸盐含量极低不致癌但卫生问题存在",
+    "ground_truth": "若核查嵌入的说法“隔夜茶不能喝会致癌”，核心结论是不实的：隔夜茶中亚硝酸盐通常远低于健康风险剂量，不能据此说会致癌。需要保留的真实提醒是：茶水若长时间在高温、敞口、不洁容器中放置，可能出现微生物污染、异味或霉变，此时不应饮用。该用户原文是提问和求证，作为对话系统也可先解释而不是直接打标签。",
+    "expected_action": "private_warn",
+    "risk_level": "low",
+    "acceptable_verdicts": [
+      "大部分不实",
+      "误导性信息",
+      "部分属实"
+    ],
+    "evidence_urls": [
+      "https://www.news.cn/food/20240523/a7269598a6d9433c8e492e9bce14e231/c.html",
+      "https://piyao.kepuchina.cn/rumor/rumordetail?id=qrvx"
+    ]
+  },
+  {
+    "id": "balanced_true_01",
+    "category": "健康养生",
+    "message": "[微信群消息] 不是吓唬人哈，培根、火腿肠、腊肠这类加工肉真的被WHO/IARC列到“一类致癌物”了😳 但别理解成“吃一根=抽烟”，同组只是证据强度，不是风险一样大。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "true fact with alarming tone",
+    "ground_truth": "WHO/IARC确实将加工肉制品列为IARC Group 1，即对人类致癌；WHO同时说明，与烟草同组不代表危险程度相同，分类反映的是致癌证据强度而不是风险大小。",
+    "evidence_urls": [
+      "https://www.who.int/news-room/questions-and-answers/item/cancer-carcinogenicity-of-the-consumption-of-red-meat-and-processed-meat/"
+    ],
+    "difficulty_tags": [
+      "true_but_rumor_like",
+      "health",
+      "nuance_required"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "balanced_true_02",
+    "category": "金融财经",
+    "message": "家人们别慌但这个是真的：银行不是“想看你隐私”，反洗钱规定里现金存取5万以上、个人境内转账50万以上、跨境20万以上，金融机构要做大额交易报告。不是说自动冻结/自动扣税哈。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "true fact with alarming tone",
+    "ground_truth": "《金融机构大额交易和可疑交易报告管理办法》第五条规定，人民币5万元以上现金收支、自然人客户50万元以上境内款项划转、20万元以上跨境款项划转等达到标准的交易，金融机构应报告。该报告义务不等于交易违法、自动冻结或自动征税。",
+    "evidence_urls": [
+      "https://www.gov.cn/gongbao/content/2017/content_5213199.htm"
+    ],
+    "difficulty_tags": [
+      "true_but_rumor_like",
+      "finance",
+      "policy_thresholds"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "balanced_true_03",
+    "category": "健康养生",
+    "message": "小红书刷到的提醒：被狗/猫咬破皮别拿酒精随便擦擦就算了，狂犬病一旦发病基本没救，先流动水+肥皂水冲15分钟左右，再去狂犬病暴露门诊评估疫苗/免疫球蛋白。这个真不是营销号。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "true fact with alarming tone",
+    "ground_truth": "中国疾控中心说明狂犬病病死率接近100%、无有效治疗手段，暴露后预防很关键；《狂犬病暴露预防处置工作规范（2023年版）》要求用肥皂水和流动清水交替彻底冲洗伤口约15分钟，并按暴露等级接种疫苗或使用被动免疫制剂。",
+    "evidence_urls": [
+      "https://www.chinacdc.cn/jkts/202409/t20240928_301171.html",
+      "https://www.chinacdc.cn/jkyj/crb2/yl/kqb/jswj_kqb/202409/P020240906525421817465.pdf"
+    ],
+    "difficulty_tags": [
+      "true_but_rumor_like",
+      "health",
+      "urgent_tone"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "high"
+  },
+  {
+    "id": "balanced_true_04",
+    "category": "健康养生",
+    "message": "我妈说“吃西柚不能乱配药”我还以为玄学😂 查了下是真的，西柚汁会影响部分降脂药、降压药、抗排异药等，正在吃药的最好看说明书/问医生。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "true fact that sounds like food myth",
+    "ground_truth": "美国FDA说明，西柚汁可与部分药物发生相互作用，包括某些他汀类降脂药、部分降压药、抗排异药、抗焦虑药等；服药者应查看说明书或咨询医务人员。",
+    "evidence_urls": [
+      "https://www.fda.gov/consumers/consumer-updates/grapefruit-juice-and-some-drugs-dont-mix"
+    ],
+    "difficulty_tags": [
+      "true_but_rumor_like",
+      "food_medicine_interaction",
+      "health"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_true_05",
+    "category": "政策法规",
+    "message": "带娃坐火车的注意下：儿童票现在主要看年龄不是身高了。6岁以下不占座可免费，6岁到未满14岁买儿童优惠票，14岁以上全价。12306上写得挺清楚。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "true policy fact often confused in family chats",
+    "ground_truth": "中国铁路12306说明，随同成年人乘车儿童年满6周岁且未满14周岁应购买儿童优惠票，年满14周岁应购买全价票；每名持票成年人可免费携带一名未满6周岁且不单独占用席位的儿童，儿童年龄按乘车日期计算。",
+    "evidence_urls": [
+      "https://kyfw.12306.cn/otn/gonggao/children.html",
+      "https://www.gov.cn/zhengce/zhengceku/2022-11/18/content_5727695.htm"
+    ],
+    "difficulty_tags": [
+      "true_but_rumor_like",
+      "policy",
+      "travel"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "balanced_partly_01",
+    "category": "灾难恐慌",
+    "message": "微博上说今年厄尔尼诺要来了，南方会一直暴雨到秋天、北方全线大旱，粮食要大面积绝收……前半句好像有依据，后面听着有点过了吧？",
+    "expected_verdict": "部分属实",
+    "acceptable_verdicts": [
+      "部分属实",
+      "误导性信息"
+    ],
+    "note": "mixed climate forecast: real ENSO risk plus exaggerated deterministic disaster claims",
+    "ground_truth": "国家气候中心和WMO均指出2026年发生厄尔尼诺的可能性上升，并可能影响全球气温和降水格局；但具体强度、区域影响和极端天气仍需动态监测，不能据此断言中国南方会持续暴雨到秋天、北方全线大旱或粮食大面积绝收。",
+    "evidence_urls": [
+      "https://www.cma.gov.cn/2011xwzx/2011xmtjj/202604/t20260418_7740550.html",
+      "https://wmo.int/media/news/wmo-likelihood-increases-of-el-nino"
+    ],
+    "difficulty_tags": [
+      "partly_true",
+      "forecast_uncertainty",
+      "disaster_panic"
+    ],
+    "expected_action": "mixed_correction",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_partly_02",
+    "category": "健康养生",
+    "message": "小红书笔记：WHO都说了成年人每周要运动150分钟，所以每天再喝8杯浓绿茶，心脏病能慢慢治好，降脂药也可以停一停。姐妹们我先存疑……",
+    "expected_verdict": "部分属实",
+    "acceptable_verdicts": [
+      "部分属实",
+      "大部分不实"
+    ],
+    "note": "true exercise guideline mixed with false treatment advice",
+    "ground_truth": "WHO建议成年人每周至少进行150分钟中等强度身体活动，增加到300分钟可获得更多健康益处；但绿茶不能治愈心脏病，也不能作为停用降脂药或其他处方治疗的依据。NCCIH指出，关于绿茶多数健康用途尚不能得出确定结论。",
+    "evidence_urls": [
+      "https://www.who.int/initiatives/behealthy/physical-activity",
+      "https://www.nccih.nih.gov/health/green-tea"
+    ],
+    "difficulty_tags": [
+      "partly_true",
+      "health",
+      "treatment_claim",
+      "mixed_claims"
+    ],
+    "expected_action": "mixed_correction",
+    "risk_level": "high"
+  },
+  {
+    "id": "balanced_partly_03",
+    "category": "健康养生",
+    "message": "[群聊转发] 狗咬破皮要先冲洗15分钟，再去打狂犬疫苗，这个没问题。但有人说就算已经发病了，补打几针疫苗也能治好，不用太怕。",
+    "expected_verdict": "部分属实",
+    "acceptable_verdicts": [
+      "部分属实",
+      "大部分不实"
+    ],
+    "note": "correct first aid mixed with dangerous false reassurance",
+    "ground_truth": "暴露后及时冲洗伤口并按等级接种狂犬病疫苗/使用被动免疫制剂是正确的；但狂犬病一旦出现临床症状，病死率接近100%，不能说发病后补打几针疫苗即可治好。",
+    "evidence_urls": [
+      "https://www.chinacdc.cn/jkts/202409/t20240928_301171.html",
+      "https://www.chinacdc.cn/jkyj/crb2/yl/kqb/jswj_kqb/202409/P020240906525421817465.pdf",
+      "https://www.who.int/news-room/fact-sheets/detail/rabies"
+    ],
+    "difficulty_tags": [
+      "partly_true",
+      "health",
+      "dangerous_mixed_advice"
+    ],
+    "expected_action": "mixed_correction",
+    "risk_level": "high"
+  },
+  {
+    "id": "balanced_unverifiable_01",
+    "category": "诈骗套路",
+    "message": "[微信群消息] 刚看到邻居群说“今晚8点后会有人上门登记房产证、身份证、银行卡，用来发放社区补贴”，没写哪个街道也没公章，只有个接龙。有人知道真假吗？",
+    "expected_verdict": "无法核实",
+    "acceptable_verdicts": [
+      "无法核实"
+    ],
+    "note": "insufficient location and source; high scam risk",
+    "ground_truth": "该消息缺少具体城市、街道、社区名称、发布主体、正式通知链接和可核验联系方式，无法确认是否确有其事。类似以补贴名义索要银行卡、身份证、密码或验证码的信息属于常见诈骗套路，应通过社区居委会、街道办或政府官网核实。",
+    "evidence_urls": [
+      "https://www.mps.gov.cn/n2253534/n2253543/c9257095/content.html",
+      "https://news.cctv.com/2025/11/30/ARTIVdwatCQABZimnEteH0TV251130.shtml"
+    ],
+    "difficulty_tags": [
+      "unverifiable",
+      "insufficient_specifics",
+      "scam_risk"
+    ],
+    "expected_action": "verify_official_channel",
+    "risk_level": "high"
+  },
+  {
+    "id": "balanced_unverifiable_02",
+    "category": "健康养生",
+    "message": "朋友圈有人说“某大牌牛奶最新一批检出问题，医院内部都不让喝了”，但没说品牌全名、批号、生产日期，也没截图来源。先别给小孩喝吗？",
+    "expected_verdict": "无法核实",
+    "acceptable_verdicts": [
+      "无法核实"
+    ],
+    "note": "food safety claim lacks brand, batch, date, authority source",
+    "ground_truth": "食品安全召回或抽检问题通常需要明确食品名称、生产者、规格、生产日期、批号、召回原因和发布机构。该消息没有品牌全名、批次、产地、日期或市场监管部门公告，无法验证具体事实；可查询市场监管总局食品抽检公布结果或官方召回公告。",
+    "evidence_urls": [
+      "https://spcjsac.gsxt.gov.cn/",
+      "https://www.gov.cn/gongbao/2026/issue_12686/202604/content_7066099.html"
+    ],
+    "difficulty_tags": [
+      "unverifiable",
+      "food_safety",
+      "missing_batch_info"
+    ],
+    "expected_action": "verify_official_channel",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_false_01",
+    "category": "政策法规",
+    "message": "政策笔记：2026年开始退休年龄已经统一改成65岁，男女一样，没有弹性提前退休这一说了。大家社保规划可以按65岁算。",
+    "expected_verdict": "谣言",
+    "acceptable_verdicts": [
+      "谣言"
+    ],
+    "note": "false calm policy claim without typical rumor cues",
+    "ground_truth": "官方决定是从2025年1月1日起实施渐进式延迟法定退休年龄，用15年逐步将男职工从60岁延至63岁、原55岁退休女职工延至58岁、原50岁退休女职工延至55岁，并规定符合条件者可自愿选择弹性提前退休，提前时间最长不超过3年。并非2026年统一65岁，也不是取消弹性。",
+    "evidence_urls": [
+      "https://www.gov.cn/yaowen/liebiao/202409/content_6974294.htm"
+    ],
+    "difficulty_tags": [
+      "false_without_rumor_cues",
+      "policy",
+      "calm_plausible"
+    ],
+    "expected_action": "correction",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_false_02",
+    "category": "金融财经",
+    "message": "理财群里有人说，6月起银行存款利息恢复20%个人所得税，定存到期最好提前取出来重新买理财。我看像内部消息但没找到公告。",
+    "expected_verdict": "谣言",
+    "acceptable_verdicts": [
+      "谣言"
+    ],
+    "note": "false calm finance claim without typical rumor cues",
+    "ground_truth": "国家税务总局政策法规库中《国家税务总局关于做好对储蓄存款利息所得暂免征收个人所得税工作的通知》显示全文有效，明确自2008年10月9日起暂免征收储蓄存款利息所得个人所得税。没有证据显示2026年6月恢复20%利息税。",
+    "evidence_urls": [
+      "https://fgk.chinatax.gov.cn/zcfgk/c100012/c5214034/content.html"
+    ],
+    "difficulty_tags": [
+      "false_without_rumor_cues",
+      "finance",
+      "tax_policy"
+    ],
+    "expected_action": "correction",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_false_03",
+    "category": "健康养生",
+    "message": "感冒初期吃点阿莫西林或者头孢会好得快一点，虽然不是必须，但可以把病程压到两三天。家里常备就行。",
+    "expected_verdict": "谣言",
+    "acceptable_verdicts": [
+      "谣言"
+    ],
+    "note": "false calm health advice without typical rumor cues",
+    "ground_truth": "普通感冒主要由病毒引起。CDC和NHS均说明，抗生素对病毒感染如普通感冒、流感无效，不会让普通感冒更快好转；滥用抗生素还会增加耐药和副作用风险。抗生素应按医生判断用于细菌感染。",
+    "evidence_urls": [
+      "https://www.cdc.gov/common-cold/treatment/index.html",
+      "https://www.nhs.uk/medicines/antibiotics/"
+    ],
+    "difficulty_tags": [
+      "false_without_rumor_cues",
+      "health",
+      "medical_advice"
+    ],
+    "expected_action": "correction",
+    "risk_level": "high"
+  },
+  {
+    "id": "balanced_warning_context_01",
+    "category": "诈骗套路",
+    "message": "转发一下：收到“社保卡到期/未上传电子信息，点链接补录”的短信别点！人社部门短信不会让你进奇怪网址填身份证、银行卡、验证码，真有问题打12333或去大厅问。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "negation context: true warning about a scam rumor",
+    "ground_truth": "人力资源社会保障部提醒，人社部门推送短信不会附加不明网址，也不需要输入个人信息、银行账号等私密信息；收到类似社保卡异常、升级、审核未通过等短信，应通过12333或人社服务大厅核实。",
+    "evidence_urls": [
+      "https://www.mohrss.gov.cn/SYrlzyhshbzb/zhuanti/jinbaogongcheng/jbgcshehuibaozhangka/jbgcshbzkmeitijujiao/202404/t20240415_516849.html"
+    ],
+    "difficulty_tags": [
+      "negation_context",
+      "anti_scam",
+      "true_warning"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "high"
+  },
+  {
+    "id": "balanced_warning_context_02",
+    "category": "诈骗套路",
+    "message": "别信“微信/支付宝免密支付不关就每月扣费”的电话！让你下载会议软件、开屏幕共享、刷脸或输验证码的都是骗子。免密支付功能本身不收费，有疑问只在App里查。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "negation context: true warning about payment scam",
+    "ground_truth": "金融监管总局提示，共享屏幕类诈骗会诱导用户下载软件、开启屏幕共享，从而获取银行卡、密码、验证码等信息。微信安全中心也提醒，微信支付免密支付功能本身不收取费用，任何以关闭免密支付为由要求下载软件、索要收费或指导操作的行为均属诈骗。",
+    "evidence_urls": [
+      "https://www.gov.cn/lianbo/bumen/202407/content_6964352.htm",
+      "https://finance.sina.com.cn/tech/digi/2025-12-16/doc-inhazaxi7992253.shtml"
+    ],
+    "difficulty_tags": [
+      "negation_context",
+      "anti_scam",
+      "screen_sharing_scam"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "high"
+  },
+  {
+    "id": "balanced_warning_context_03",
+    "category": "灾难恐慌",
+    "message": "看到有人拿“地震云”“鱼鳞云”预测今晚地震，别信这个。地震不能靠云图精确预测时间地点震级，真有预警看官方渠道。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "negation context: true debunking statement",
+    "ground_truth": "USGS说明，地震预测必须给出日期时间、地点和震级，而科学家不能精确预测地震，只能计算一定区域和时间内发生地震的概率。中国互联网联合辟谣平台和央视也多次说明，“地震云”等自然现象与地震预测没有科学依据。",
+    "evidence_urls": [
+      "https://www.usgs.gov/faqs/can-you-predict-earthquakes",
+      "https://www.piyao.org.cn/20250114/343f224aa23e4fab94543b451536da1a/c.html",
+      "https://news.cctv.com/2025/01/14/ARTIwBSa7AjSYfKToGJwnCn3250114.shtml"
+    ],
+    "difficulty_tags": [
+      "negation_context",
+      "disaster",
+      "true_debunking"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_oldnews_true_01",
+    "category": "旧闻翻炒",
+    "message": "补个时间线：2023年5月26日，韩国韩亚航空OZ8124从济州飞大邱，降落前一名乘客打开舱门，飞机安全落地，9名乘客因呼吸困难等被送医。这个是当年的旧闻，不是今天。",
+    "expected_verdict": "属实",
+    "acceptable_verdicts": [
+      "属实"
+    ],
+    "note": "old news correctly timestamped",
+    "ground_truth": "2023年5月26日，韩亚航空OZ8124航班从济州飞往大邱，降落前舱门被乘客打开，飞机最终安全着陆，9名乘客因呼吸困难等症状被送医；消息明确标注时间和地点，属于正确引用旧闻。",
+    "evidence_urls": [
+      "https://cn.yna.co.kr/view/ACK20230526003400881",
+      "https://www.news.cn/world/2023-05/26/c_1129648155.htm"
+    ],
+    "difficulty_tags": [
+      "old_news_correctly_cited",
+      "true",
+      "timestamped"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "low"
+  },
+  {
+    "id": "balanced_oldnews_misleading_01",
+    "category": "旧闻翻炒",
+    "message": "刚刷到视频：飞机降落前舱门被乘客打开，机舱里风巨夸张，好多人送医……最近坐飞机真的要小心了，怎么又出这种事。",
+    "expected_verdict": "误导性信息",
+    "acceptable_verdicts": [
+      "误导性信息"
+    ],
+    "note": "same event as previous case, stripped of timestamp and framed as recent",
+    "ground_truth": "该描述对应的是2023年5月26日韩国韩亚航空OZ8124航班事件，而不是当前新发生的国内航班事件。消息去掉时间和地点，并用“刚刷到”“最近坐飞机”等表达制造近期事件印象，属于旧闻翻炒造成误导。",
+    "evidence_urls": [
+      "https://cn.yna.co.kr/view/ACK20230526003400881",
+      "https://www.news.cn/world/2023-05/26/c_1129648155.htm"
+    ],
+    "difficulty_tags": [
+      "old_news_recycled",
+      "misleading",
+      "timestamp_missing"
+    ],
+    "expected_action": "contextualize_old_news",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_multi_claim_01",
+    "category": "金融财经",
+    "message": "[家庭群] 关于银行卡三件事我整理下：①现在储蓄存款利息暂免个税；②个人转账只要超过20万就自动扣20%税；③现金存取5万以上可能会被银行按大额交易上报。看完有点晕。",
+    "expected_verdict": "部分属实",
+    "acceptable_verdicts": [
+      "部分属实"
+    ],
+    "note": "multi-claim with mixed verdicts",
+    "ground_truth": "第①项属实：储蓄存款利息所得自2008年10月9日起暂免征收个人所得税，相关文件在税务政策库中标注全文有效。第②项不实：个人转账超过20万元并不会自动扣20%税。第③项属实但需限定：人民币5万元以上现金收支属于大额交易报告标准之一；自然人境内转账报告标准通常是50万元以上，跨境为20万元以上。大额交易报告不等于征税或冻结。",
+    "evidence_urls": [
+      "https://fgk.chinatax.gov.cn/zcfgk/c100012/c5214034/content.html",
+      "https://www.gov.cn/gongbao/content/2017/content_5213199.htm"
+    ],
+    "difficulty_tags": [
+      "mixed_multi_claim",
+      "finance",
+      "policy_thresholds",
+      "partly_true"
+    ],
+    "expected_action": "mixed_correction",
+    "risk_level": "medium"
+  },
+  {
+    "id": "balanced_multi_claim_02",
+    "category": "健康养生",
+    "message": "小红书养生贴：1）成年人每周150-300分钟中等强度运动对健康有益；2）每天早上空腹柠檬水能把身体变碱性、饿死癌细胞；3）吃某些他汀/降压药的人要注意西柚。这个贴一半像科普一半像玄学😂",
+    "expected_verdict": "部分属实",
+    "acceptable_verdicts": [
+      "部分属实"
+    ],
+    "note": "multi-claim with true guideline, false cancer cure, true drug-food interaction",
+    "ground_truth": "第①项属实：WHO建议成年人每周进行150-300分钟中等强度有氧活动或等量活动。第②项不实：所谓通过柠檬水或碱性饮食改变身体pH、饿死癌细胞缺乏科学证据；人体血液pH受到严格调节，碱性饮食不能治愈癌症。第③项属实：FDA说明西柚汁可影响部分他汀类降脂药、部分降压药等药物。",
+    "evidence_urls": [
+      "https://www.who.int/initiatives/behealthy/physical-activity",
+      "https://www.aicr.org/resources/blog/does-the-alkaline-diet-cure-cancer/",
+      "https://www.mdanderson.org/cancerwise/alkaline-diet--what-cancer-patients-should-know.h00-159223356.html",
+      "https://www.fda.gov/consumers/consumer-updates/grapefruit-juice-and-some-drugs-dont-mix"
+    ],
+    "difficulty_tags": [
+      "mixed_multi_claim",
+      "health",
+      "true_and_false_subclaims",
+      "partly_true"
+    ],
+    "expected_action": "mixed_correction",
+    "risk_level": "high"
+  },
+  {
+    "id": "grey_zone_01",
+    "category": "政策法规",
+    "message": "家人们，看到北大学硕取消，想知道文学类会不会取消啊！刚准备二战现当代文学，不要啊。有人说只是法学学硕，有人说应该只有社科学部，还有人说全部取消但顺序有先后，今年都不一定呢。",
+    "expected_verdict": "无法核实",
+    "acceptable_verdicts": [
+      "无法核实",
+      "部分属实"
+    ],
+    "note": "灰色地带：有真实事件基础（部分学部调整），但核心焦虑（文学类是否取消）无官方确认，多个矛盾信源",
+    "ground_truth": "北京大学部分学部（如法学院）确有调整学术型硕士招生的消息，但不同学部节奏不同，文学类是否取消缺乏官方通知。该消息混合了已确认信息、未确认推测和恐慌情绪。",
+    "evidence_urls": [],
+    "difficulty_tags": [
+      "grey_zone",
+      "future_uncertainty",
+      "multiple_conflicting_sources",
+      "policy"
+    ],
+    "expected_action": "verify_official_channel",
+    "risk_level": "medium"
+  },
+  {
+    "id": "not_checkworthy_01",
+    "category": "其他",
+    "message": "好自私，别人为什么要谅解你？公共教室没课的时候任何人都可以来自习，为什么你两个人在黑板上写上就不让别人来了呢，门口显示屏显示是空教室。我吐槽的是她们又没有干正事，在教室里吃喝，看手机笑，故意拖着脚走路弄出声音来，那凭什么两个人能占用一个教室。",
+    "expected_verdict": "无法核实",
+    "acceptable_verdicts": [
+      "无法核实"
+    ],
+    "note": "纯个人经历吐槽，不包含可公开核查的事实声明",
+    "ground_truth": "个人经历叙述和主观评价，不涉及可通过公开渠道核实的事实声明。",
+    "difficulty_tags": [
+      "not_checkworthy",
+      "personal_experience",
+      "opinion"
+    ],
+    "expected_action": "no_action",
+    "risk_level": "low",
+    "source": "real_user"
+  },
+  {
+    "id": "not_checkworthy_02",
+    "category": "其他",
+    "message": "视频号被pony关注了，4个月我才发现。今天偶然发现自己视频号被pony和dowson关注了，而且是关注4个月和9个月才发现。最近聊了不少ceo、投资合伙人还有国企高管，发现大家居然都在一线ai coding和养虾养马，也是之前变革中没有的新状态，很有意思。",
+    "expected_verdict": "无法核实",
+    "acceptable_verdicts": [
+      "无法核实"
+    ],
+    "note": "个人声称被名人关注，无法通过公开渠道验证",
+    "ground_truth": "个人社交媒体互动属于私密信息，无法通过公开渠道核实。即使截图为真，也属于个人事务而非公共事实。",
+    "difficulty_tags": [
+      "not_checkworthy",
+      "personal_claim",
+      "unverifiable_private"
+    ],
+    "expected_action": "no_action",
+    "risk_level": "low",
+    "source": "real_user"
+  },
+  {
+    "id": "sarcasm_true_01",
+    "category": "其他",
+    "message": "热知识：为张雪机车发动机提供爆发力的钛铝合金气门等技术支持的佛山季华实验室，在2025年初时候已经上了美国实施制裁名单，颁发了全球顶尖技术认证书。",
+    "expected_verdict": "部分属实",
+    "acceptable_verdicts": [
+      "部分属实",
+      "属实",
+      "误导性信息"
+    ],
+    "note": "反讽/梗文化：核心事实（季华实验室存在、钛铝合金气门、被美国制裁）全部属实，但\"全球顶尖技术认证书\"是反讽表达——把制裁说成认证。系统不能因为语气夸张就判假。",
+    "ground_truth": "佛山季华实验室确实在2025年1月6日被美国商务部列入实体清单（理由：高超音速武器相关）。该实验室确实为张雪机车开发了钛铝合金气门技术，实现中国民用领域首次商用。\"全球顶尖技术认证书\"是网络反讽，把被制裁说成被\"认证\"。",
+    "evidence_urls": [
+      "https://www.federalregister.gov/documents/2025/01/06/2024-31468/revisions-to-the-entity-list",
+      "https://www.21jingji.com/article/20260330/herald/82095e8204faeff180c962cd5a5471c8.html"
+    ],
+    "difficulty_tags": [
+      "sarcasm",
+      "irony",
+      "true_facts_exaggerated_tone",
+      "sanctions"
+    ],
+    "expected_action": "positive_confirm",
+    "risk_level": "low",
+    "source": "real_user"
+  }
+]

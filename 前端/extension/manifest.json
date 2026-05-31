@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "TruthNote — 小T帮你查",
+  "version": "1.1.0",
+  "description": "选中文字，30秒告诉你哪里有问题。覆盖微博、知乎、X等十大平台。",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    },
+    "default_title": "小T"
+  },
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "options_ui": {
+    "page": "pages/options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["css/content.css", "css/render-cards.css", "css/platform.css"],
+      "js": [
+        "js/render-engine.js",
+        "js/platform-engine.js",
+        "js/adapters/weibo.js",
+        "js/adapters/zhihu.js",
+        "js/adapters/wechat.js",
+        "js/adapters/xiaohongshu.js",
+        "js/adapters/bilibili.js",
+        "js/adapters/twitter.js",
+        "js/adapters/douban.js",
+        "js/adapters/toutiao.js",
+        "js/adapters/tieba.js",
+        "js/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["activeTab", "storage", "clipboardWrite", "contextMenus"],
+  "host_permissions": ["http://localhost:8000/*"],
+  "web_accessible_resources": [
+    { "resources": ["assets/*"], "matches": ["<all_urls>"] }
+  ]
+}

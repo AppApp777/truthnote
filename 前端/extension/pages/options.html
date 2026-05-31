@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TruthNote 设置 · 小T</title>
+  <!-- 双击本文件(file://)即可预览界面效果；chrome.* 缺失时自动降级，不报错。 -->
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/options.css">
+</head>
+<body>
+  <div class="opt-wrap">
+
+    <header class="opt-head">
+      <div class="opt-logo" aria-hidden="true"><span class="opt-eye"></span><span class="opt-eye"></span></div>
+      <div class="opt-head-text">
+        <h1 class="opt-h1">小T · 设置</h1>
+        <p class="opt-head-sub">TruthNote · 信息真相核查</p>
+      </div>
+    </header>
+
+    <!-- 账户 · 会员 -->
+    <section class="opt-card">
+      <div class="opt-card-head">
+        <h2 class="opt-card-title">账户 · 会员</h2>
+        <button class="opt-btn opt-btn--primary opt-btn--sm" id="upgradeBtn" type="button">升级会员</button>
+      </div>
+      <ul class="opt-tiers">
+        <li class="opt-tier">
+          <span class="opt-tier-name">免费版</span>
+          <span class="opt-tier-desc">每日 20 次</span>
+          <span class="opt-tier-tag">当前</span>
+        </li>
+        <li class="opt-tier">
+          <span class="opt-tier-name">专业版</span>
+          <span class="opt-tier-desc">每日 200 次</span>
+          <span class="opt-tier-price">¥19/月</span>
+        </li>
+        <li class="opt-tier">
+          <span class="opt-tier-name">企业版</span>
+          <span class="opt-tier-desc">不限次</span>
+          <span class="opt-tier-price">按量计费</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 核查方式 -->
+    <section class="opt-card">
+      <h2 class="opt-card-title">核查方式</h2>
+
+      <div class="opt-field opt-field--row">
+        <div class="opt-field-main">
+          <span class="opt-label">选中文字后弹出"查"触点</span>
+        </div>
+        <button class="opt-switch" id="tgSelectTrigger" type="button" role="switch" aria-checked="true" aria-label="选中弹查触点开关"><span class="opt-switch-knob"></span></button>
+      </div>
+
+      <div class="opt-field opt-field--row">
+        <div class="opt-field-main">
+          <span class="opt-label">右键菜单核查</span>
+        </div>
+        <button class="opt-switch" id="tgContextMenu" type="button" role="switch" aria-checked="true" aria-label="右键菜单核查开关"><span class="opt-switch-knob"></span></button>
+      </div>
+    </section>
+
+    <!-- 显示 -->
+    <section class="opt-card">
+      <h2 class="opt-card-title">显示</h2>
+
+      <div class="opt-field opt-field--row">
+        <div class="opt-field-main">
+          <span class="opt-label">右下角常驻挂件</span>
+        </div>
+        <button class="opt-switch" id="tgWidget" type="button" role="switch" aria-checked="true" aria-label="常驻挂件开关"><span class="opt-switch-knob"></span></button>
+      </div>
+
+      <div class="opt-field opt-field--row">
+        <div class="opt-field-main">
+          <span class="opt-label">推理详情默认展开</span>
+        </div>
+        <button class="opt-switch" id="tgReasoning" type="button" role="switch" aria-checked="false" aria-label="推理详情默认展开开关"><span class="opt-switch-knob"></span></button>
+      </div>
+
+      <div class="opt-field opt-field--row">
+        <div class="opt-field-main">
+          <span class="opt-label">界面动效</span>
+        </div>
+        <button class="opt-switch" id="tgMotion" type="button" role="switch" aria-checked="true" aria-label="界面动效开关"><span class="opt-switch-knob"></span></button>
+      </div>
+    </section>
+
+    <!-- 隐私与数据 -->
+    <section class="opt-card">
+      <h2 class="opt-card-title">隐私与数据</h2>
+
+      <div class="opt-field opt-field--row">
+        <div class="opt-field-main">
+          <span class="opt-label">允许上传核查数据，帮小T 越用越准</span>
+          <p class="opt-hint">开启后，你的核查记录会<strong>匿名汇入小T 云端库</strong>，参与构建<a class="opt-inlink" id="boardLink" role="link" tabindex="0" aria-label="查看社会辟谣大厅">社会辟谣体系 ↗</a>、帮更多人少被谣言骗；作为回馈，参与辟谣可获得<strong>更多查询额度</strong>。关闭则全部只在你本地运算、不出你的电脑。<strong>默认关闭。</strong></p>
+        </div>
+        <button class="opt-switch" id="tgDataUpload" type="button" role="switch" aria-checked="false" aria-label="允许上传核查数据开关"><span class="opt-switch-knob"></span></button>
+      </div>
+
+      <div class="opt-data-actions">
+        <button class="opt-btn opt-btn--ghost" id="clearBtn" type="button">清空核查历史</button>
+        <span class="opt-save-flash" id="saveFlash" hidden>已清空 ✓</span>
+      </div>
+    </section>
+
+    <!-- 高级设置（默认折叠：接入自己的服务与模型） -->
+    <section class="opt-card">
+      <button class="opt-collapse-head" id="advToggle" type="button" aria-expanded="false" aria-controls="advBody">
+        <span class="opt-card-title opt-card-title--inline">高级设置</span>
+        <span class="opt-collapse-icon" id="advIcon" aria-hidden="true">▾</span>
+      </button>
+      <div class="opt-collapse-body is-collapsed" id="advBody">
+        <div class="opt-field">
+          <label class="opt-label" for="cfgUrl">API 地址</label>
+          <input class="opt-input" id="cfgUrl" type="text" placeholder="默认使用小T云端服务" spellcheck="false" autocomplete="off">
+        </div>
+
+        <div class="opt-field">
+          <label class="opt-label" for="cfgToken">API 密钥</label>
+          <div class="opt-pw">
+            <input class="opt-input" id="cfgToken" type="password" placeholder="可选" spellcheck="false" autocomplete="off">
+            <button class="opt-pw-toggle" id="cfgTokenReveal" type="button">显示</button>
+          </div>
+        </div>
+
+        <div class="opt-grid2">
+          <div class="opt-field">
+            <label class="opt-label" for="cfgBaseModel">基础模型</label>
+            <input class="opt-input" id="cfgBaseModel" type="text" placeholder="默认 deepseek-v4-flash" spellcheck="false" autocomplete="off">
+          </div>
+          <div class="opt-field">
+            <label class="opt-label" for="cfgStrongModel">关键模型</label>
+            <input class="opt-input" id="cfgStrongModel" type="text" placeholder="默认 qwen-max" spellcheck="false" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 关于 -->
+    <section class="opt-card">
+      <h2 class="opt-card-title">关于</h2>
+      <div class="opt-about-row"><span>插件版本</span><span id="feVersion">—</span></div>
+      <div class="opt-links">
+        <a class="opt-link" id="lnkHelp" role="button" tabindex="0">使用帮助 →</a>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="../js/options.js"></script>
+</body>
+</html>

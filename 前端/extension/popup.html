@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="header-eyes">
+      <div class="eye"></div>
+      <div class="eye"></div>
+    </div>
+    <span class="header-status"></span>
+  </div>
+
+  <div class="state-empty" id="stateEmpty">
+    <div class="big-eyes">
+      <div class="big-eye"></div>
+      <div class="big-eye"></div>
+    </div>
+    <div class="brand-name">小T</div>
+    <div class="guide-text">给小T一段话。</div>
+    <div class="guide-steps">
+      <div class="guide-step">1. 选中网页上的文字</div>
+      <div class="guide-step">2. 点旁边出现的 <span style="background:#000;color:#fff;padding:1px 6px;font-size:11px;">■■ 查</span></div>
+      <div class="guide-step">3. 右下角小T会告诉你结果</div>
+    </div>
+  </div>
+
+  <div class="state-has-selection" id="stateSelection" style="display:none">
+    <div class="big-eyes">
+      <div class="big-eye"></div>
+      <div class="big-eye"></div>
+    </div>
+    <div class="selected-text" id="selectedText"></div>
+    <button class="btn btn--primary" id="btnCheck">查</button>
+  </div>
+
+  <script src="js/popup.js"></script>
+</body>
+</html>

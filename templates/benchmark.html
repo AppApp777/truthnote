@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthNote — 评测报告</title>
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --surface: #ffffff;
+            --surface2: #f9fafb;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text2: #6b7280;
+            --accent: #2563eb;
+            --accent-dim: #1d4ed8;
+            --green: #16a34a;
+            --green-dim: #dcfce7;
+            --red: #dc2626;
+            --red-dim: #fee2e2;
+            --yellow: #d97706;
+            --yellow-dim: #fef3c7;
+            --blue: #2563eb;
+            --blue-dim: #dbeafe;
+            --mono: "Cascadia Code", "Fira Code", "JetBrains Mono", "Consolas", monospace;
+            --sans: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+            --radius: 10px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── 顶栏 ────────────────────────────────────────── */
+        .top-nav { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .top-nav a { padding: 6px 14px; border-radius: 8px; text-decoration: none; color: var(--text2); font-weight: 500; transition: all 0.2s; }
+        .top-nav a:hover { background: var(--surface2); color: var(--text); }
+        .top-nav a.active { background: var(--accent); color: #fff; }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .topbar h1 span { color: var(--accent); }
+        .topbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .config-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text2);
+        }
+        .config-group label { cursor: pointer; user-select: none; }
+        .config-group input[type="checkbox"] {
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .config-group input[type="number"] {
+            width: 52px;
+            padding: 3px 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .btn-start {
+            padding: 7px 20px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-start:hover { background: var(--accent-dim); }
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--text2);
+            display: inline-block;
+        }
+        .status-dot.running {
+            background: var(--green);
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ── 主布局 ───────────────────────────────────────── */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 0;
+            height: calc(100vh - 52px);
+        }
+        @media (max-width: 960px) {
+            .main { grid-template-columns: 1fr; }
+            .right-panel { max-height: 50vh; }
+        }
+
+        /* ── 左面板 ───────────────────────────────────────── */
+        .left-panel {
+            padding: 16px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .case-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+        .case-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .case-num {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .case-type-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .badge-true { background: var(--green-dim); color: var(--green); }
+        .badge-false { background: var(--red-dim); color: var(--red); }
+        .case-text {
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .pipeline-steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .step-chip {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--surface2);
+            color: var(--text2);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .step-chip.active {
+            background: var(--blue-dim);
+            color: var(--blue);
+            border-color: var(--blue);
+        }
+        .step-chip.done {
+            background: var(--green-dim);
+            color: var(--green);
+            border-color: transparent;
+        }
+
+        /* ── LLM 输出流 ──────────────────────────────────── */
+        .stream-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            min-height: 200px;
+            max-height: 350px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .stream-content {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            line-height: 1.6;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .stream-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 14px;
+            background: var(--accent);
+            animation: blink 0.8s step-end infinite;
+            vertical-align: text-bottom;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* ── 右面板 ───────────────────────────────────────── */
+        .right-panel {
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .progress-section h3,
+        .results-section h3,
+        .summary-section h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text2);
+            margin-bottom: 8px;
+        }
+
+        /* 进度条 */
+        .progress-bar-wrap {
+            background: var(--surface2);
+            border-radius: 6px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--blue));
+            border-radius: 6px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-info {
+            font-size: 0.8rem;
+            color: var(--text2);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 结果表 */
+        .results-table {
+            width: 100%;
+            font-size: 0.75rem;
+            border-collapse: collapse;
+        }
+        .results-table th {
+            text-align: left;
+            padding: 6px 4px;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+        }
+        .results-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            vertical-align: top;
+        }
+        .results-table tr:hover td {
+            background: var(--surface2);
+        }
+        .results-table .text-col {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .tier-ok, .tier-caught { color: var(--green); }
+        .tier-problematic, .tier-missed { color: var(--red); }
+        .tier-uncertain { color: var(--yellow); }
+        .tier-timeout, .tier-error { color: var(--text2); }
+
+        /* 汇总 */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .stat-card {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .stat-card .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .stat-card .label {
+            font-size: 0.7rem;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+        .stat-green .value { color: var(--green); }
+        .stat-red .value { color: var(--red); }
+        .stat-yellow .value { color: var(--yellow); }
+        .stat-blue .value { color: var(--blue); }
+
+        /* 空状态 */
+        .empty-state {
+            color: var(--text2);
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+        .empty-state .icon { font-size: 2rem; margin-bottom: 8px; }
+
+        /* 结果区滚动容器 */
+        .results-scroll {
+            max-height: calc(100vh - 260px);
+            overflow-y: auto;
+        }
+
+        /* ── 评委结果卡片 ─────────────────────────────────── */
+        .case-result-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .case-result-card:hover { border-color: var(--accent); }
+        .case-result-card.tier-ok, .case-result-card.tier-caught { border-left: 3px solid var(--green); }
+        .case-result-card.tier-problematic, .case-result-card.tier-missed { border-left: 3px solid var(--red); }
+        .case-result-card.tier-uncertain { border-left: 3px solid var(--yellow); }
+        .case-result-card.tier-timeout, .case-result-card.tier-error { border-left: 3px solid var(--text2); }
+
+        .card-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 12px; cursor: pointer; user-select: none;
+        }
+        .card-header:hover { background: #f9fafb; }
+        .card-num { font-size: 0.75rem; color: var(--accent); font-weight: 700; min-width: 28px; }
+        .card-tier-icon { font-size: 0.9rem; min-width: 20px; text-align: center; }
+        .card-text-preview { flex: 1; font-size: 0.8rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card-badges { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+        .card-badge {
+            font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 600;
+        }
+        .cb-expected { background: var(--surface); color: var(--text2); border: 1px solid var(--border); }
+        .cb-actual-ok { background: var(--green-dim); color: var(--green); }
+        .cb-actual-bad { background: var(--red-dim); color: var(--red); }
+        .cb-actual-unc { background: var(--yellow-dim); color: var(--yellow); }
+        .card-time { font-size: 0.7rem; color: var(--text2); min-width: 40px; text-align: right; }
+        .card-expand-icon { font-size: 0.7rem; color: var(--text2); transition: transform 0.2s; }
+        .case-result-card.expanded .card-expand-icon { transform: rotate(90deg); }
+
+        /* 展开区 */
+        .card-detail { display: none; padding: 0 12px 12px; }
+        .case-result-card.expanded .card-detail { display: block; }
+
+        .detail-section { margin-top: 10px; }
+        .detail-section-title {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--accent); font-weight: 600; margin-bottom: 6px;
+            padding-bottom: 4px; border-bottom: 1px solid var(--border);
+        }
+
+        /* 声明卡 */
+        .claim-row {
+            display: flex; align-items: flex-start; gap: 8px;
+            padding: 6px 0; border-bottom: 1px solid var(--border);
+        }
+        .claim-row:last-child { border-bottom: none; }
+        .claim-verdict-chip {
+            font-size: 0.65rem; padding: 2px 6px; border-radius: 4px;
+            font-weight: 600; white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+        }
+        .cv-false, .cv-mostly-false { background: var(--red-dim); color: var(--red); }
+        .cv-misleading, .cv-partly-true { background: var(--yellow-dim); color: var(--yellow); }
+        .cv-true { background: var(--green-dim); color: var(--green); }
+        .cv-unverifiable { background: var(--surface); color: var(--text2); }
+        .claim-body { flex: 1; min-width: 0; }
+        .claim-text-line { font-size: 0.8rem; color: var(--text); line-height: 1.4; }
+        .claim-conf { font-size: 0.7rem; color: var(--text2); margin-top: 2px; }
+        .claim-reasoning { font-size: 0.75rem; color: var(--text2); margin-top: 4px; line-height: 1.4; }
+
+        /* 证据项 */
+        .evidence-item {
+            padding: 6px 8px; margin: 4px 0; border-radius: 6px;
+            border-left: 3px solid var(--border); background: #f3f4f6;
+            font-size: 0.75rem;
+        }
+        .evidence-item.ev-debunk { border-left-color: var(--red); }
+        .evidence-item.ev-support { border-left-color: var(--green); }
+        .ev-header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .ev-source-name { font-weight: 600; color: var(--text); }
+        .ev-type-tag {
+            font-size: 0.6rem; padding: 1px 5px; border-radius: 3px;
+            background: var(--surface); color: var(--text2);
+        }
+        .ev-type-gov { background: var(--blue-dim); color: var(--blue); }
+        .ev-type-fc { background: #fce7f3; color: #9d174d; }
+        .ev-type-media { background: #e0e7ff; color: #4338ca; }
+        .ev-authority { font-size: 0.6rem; color: var(--text2); }
+        .ev-stance { font-size: 0.65rem; font-weight: 600; margin-left: auto; }
+        .ev-stance-against { color: var(--red); }
+        .ev-stance-support { color: var(--green); }
+        .ev-title { color: var(--text); margin-top: 3px; }
+        .ev-snippet { color: var(--text2); margin-top: 2px; line-height: 1.3; }
+        .ev-url { color: var(--accent); text-decoration: none; font-size: 0.65rem; margin-top: 2px; display: inline-block; }
+        .ev-url:hover { text-decoration: underline; }
+
+        /* 执行链 */
+        .trace-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 3px 0; font-size: 0.72rem;
+        }
+        .trace-agent { color: var(--accent); font-weight: 600; min-width: 100px; }
+        .trace-action { color: var(--text2); flex: 1; }
+        .trace-dur { color: var(--text2); font-family: var(--mono); font-size: 0.68rem; }
+
+        /* 摘要 */
+        .detail-summary { font-size: 0.8rem; color: var(--text); line-height: 1.5; padding: 8px; background: #f3f4f6; border-radius: 6px; }
+        .detail-reply { font-size: 0.78rem; color: #166534; line-height: 1.5; padding: 8px; background: #f0fdf4; border-radius: 6px; border-left: 3px solid var(--green); margin-top: 6px; }
+
+        /* JSON 折叠 */
+        .json-toggle { font-size: 0.7rem; color: var(--accent); cursor: pointer; margin-top: 6px; }
+        .json-toggle:hover { text-decoration: underline; }
+        .json-raw { display: none; margin-top: 4px; background: var(--surface2); padding: 8px; border-radius: 6px; font-family: var(--mono); font-size: 0.68rem; color: var(--text); max-height: 300px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <a href="/">核查演示</a>
+        <a href="/dashboard">闭环追踪</a>
+        <a href="/benchmark" class="active">评测报告</a>
+    </nav>
+    <!-- ── 顶栏 ──────────────────────────────────────────── -->
+    <div class="topbar">
+        <h1><span>TruthNote</span> — 评测报告</h1>
+        <div class="topbar-controls">
+            <div class="config-group">
+                <label>数据集</label>
+                <select id="cfg-dataset" style="padding:3px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:0.8rem;">
+                    <option value="demo">路演 13 条</option>
+                    <option value="default">默认（TRUE+FALSE 全量）</option>
+                </select>
+            </div>
+            <div class="config-group">
+                <input type="checkbox" id="cfg-true" />
+                <label for="cfg-true">TRUE</label>
+            </div>
+            <div class="config-group">
+                <input type="checkbox" id="cfg-false" />
+                <label for="cfg-false">FALSE</label>
+            </div>
+            <div class="config-group">
+                <label>N</label>
+                <input type="number" id="cfg-sample" value="0" min="0" step="1" title="限制条数，0=全部" />
+            </div>
+            <div class="config-group">
+                <label>超时</label>
+                <input type="number" id="cfg-timeout" value="90" min="10" step="10" />
+                <span>s</span>
+            </div>
+            <span class="status-dot" id="status-dot"></span>
+            <button class="btn-start" id="btn-start" onclick="startBenchmark()">
+                启动测试
+            </button>
+        </div>
+    </div>
+
+    <!-- ── 主体 ──────────────────────────────────────────── -->
+    <div class="main">
+        <!-- 左面板 -->
+        <div class="left-panel" id="left-panel">
+            <div class="case-card" id="current-case">
+                <div class="empty-state" id="case-empty">
+                    <div class="icon">&#x1F50D;</div>
+                    配置参数后点击「启动测试」<br/>
+                    实时查看每条用例的 LLM 调用与推理过程
+                </div>
+                <div id="case-active" style="display:none;">
+                    <div class="case-card-header">
+                        <span class="case-num" id="case-label">#1 / 16</span>
+                        <span class="case-type-badge badge-true" id="case-badge">TRUE</span>
+                    </div>
+                    <div class="case-text" id="case-text"></div>
+                    <div class="pipeline-steps" id="pipeline-steps"></div>
+                </div>
+            </div>
+            <div class="stream-box">
+                <div class="stream-content" id="stream-content"></div>
+            </div>
+        </div>
+
+        <!-- 右面板 -->
+        <div class="right-panel">
+            <!-- 进度 -->
+            <div class="progress-section">
+                <h3>进度</h3>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-info">
+                    <span id="progress-text">0 / 0</span>
+                    <span id="progress-eta"></span>
+                </div>
+            </div>
+
+            <!-- 结果列表（评委卡片） -->
+            <div class="results-section" style="flex:1;min-height:0;">
+                <h3>核查结果</h3>
+                <div class="results-scroll" id="results-body"></div>
+            </div>
+
+            <!-- 汇总 -->
+            <div class="summary-section" id="summary-section" style="display:none;">
+                <h3>汇总</h3>
+                <div class="summary-grid" id="summary-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ── 状态 ────────────────────────────────────────────────
+    let running = false;
+    let eventSource = null;
+    let currentTotal = 0;
+    let doneCases = 0;
+    let caseStartTime = 0;
+    let totalStartTime = 0;
+
+    // 典型 pipeline 步骤
+    const STEPS = [
+        "ScenarioRouter", "ClaimExtractor", "CheckWorthy",
+        "CommonsenseChecker", "AtomicFact", "QueryPlanner",
+        "EvidenceRanker", "StructuredFC-1", "StructuredFC-2",
+        "Skeptic", "ResponseComposer"
+    ];
+    let currentStepIdx = -1;
+    let doneSteps = new Set();
+
+    // ── 启动 ────────────────────────────────────────────────
+    async function startBenchmark() {
+        if (running) return;
+
+        const dataset = document.getElementById("cfg-dataset").value;
+        const trueOnly = document.getElementById("cfg-true").checked;
+        const falseOnly = document.getElementById("cfg-false").checked;
+        const sample = parseInt(document.getElementById("cfg-sample").value) || 0;
+        const timeout = parseInt(document.getElementById("cfg-timeout").value) || 90;
+
+        const params = new URLSearchParams();
+        params.set("dataset", dataset);
+        if (trueOnly) params.set("true_only", "true");
+        if (falseOnly) params.set("false_only", "true");
+        if (sample > 0) params.set("sample", sample);
+        params.set("timeout", timeout);
+
+        try {
+            const res = await fetch("/api/benchmark/start?" + params.toString(), { method: "POST" });
+            const data = await res.json();
+            if (!data.ok) {
+                alert(data.error || "启动失败");
+                return;
+            }
+        } catch (e) {
+            alert("请求失败: " + e.message);
+            return;
+        }
+
+        running = true;
+        doneCases = 0;
+        totalStartTime = Date.now();
+        document.getElementById("btn-start").disabled = true;
+        document.getElementById("status-dot").classList.add("running");
+        document.getElementById("results-body").innerHTML = "";
+        document.getElementById("summary-section").style.display = "none";
+        document.getElementById("stream-content").textContent = "";
+
+        connectSSE();
+    }
+
+    // ── SSE 连接 ────────────────────────────────────────────
+    function connectSSE() {
+        if (eventSource) eventSource.close();
+        eventSource = new EventSource("/api/benchmark/events");
+
+        eventSource.addEventListener("benchmark_start", (e) => {
+            const d = JSON.parse(e.data);
+            currentTotal = d.total;
+            updateProgress(0, currentTotal);
+        });
+
+        let activeCaseNum = 0;
+
+        eventSource.addEventListener("case_start", (e) => {
+            const d = JSON.parse(e.data);
+            activeCaseNum = d.num;
+            caseStartTime = Date.now();
+            currentStepIdx = -1;
+            doneSteps.clear();
+            showCurrentCase(d);
+            document.getElementById("stream-content").textContent = "";
+        });
+
+        eventSource.addEventListener("llm_start", (e) => {
+            const d = JSON.parse(e.data);
+            if (d.case_num && d.case_num !== activeCaseNum) return;
+            activateStep(d.agent);
+        });
+
+        eventSource.addEventListener("llm_token", (e) => {
+            const d = JSON.parse(e.data);
+            if (d.case_num && d.case_num !== activeCaseNum) return;
+            appendToken(d.text);
+        });
+
+        eventSource.addEventListener("llm_done", (e) => {
+            const d = JSON.parse(e.data);
+            if (d.case_num && d.case_num !== activeCaseNum) return;
+            markStepDone(d.agent);
+            const el = document.getElementById("stream-content");
+            el.textContent += "\n";
+        });
+
+        eventSource.addEventListener("case_done", (e) => {
+            const d = JSON.parse(e.data);
+            doneCases++;
+            addResultRow(d);
+            updateProgress(doneCases, currentTotal);
+        });
+
+        eventSource.addEventListener("benchmark_done", (e) => {
+            const d = JSON.parse(e.data);
+            running = false;
+            document.getElementById("btn-start").disabled = false;
+            document.getElementById("status-dot").classList.remove("running");
+            showSummary(d);
+            eventSource.close();
+            eventSource = null;
+        });
+
+        eventSource.onerror = () => {
+            // 服务端关闭连接时会触发，正常场景
+        };
+    }
+
+    // ── UI 更新函数 ─────────────────────────────────────────
+    function showCurrentCase(d) {
+        document.getElementById("case-empty").style.display = "none";
+        document.getElementById("case-active").style.display = "block";
+        document.getElementById("case-label").textContent = `#${d.num} / ${d.total}`;
+
+        const badge = document.getElementById("case-badge");
+        badge.textContent = d.type;
+        badge.className = "case-type-badge " + (d.type === "TRUE" ? "badge-true" : "badge-false");
+
+        document.getElementById("case-text").textContent = d.text;
+
+        // 重建 pipeline 步骤
+        const box = document.getElementById("pipeline-steps");
+        box.innerHTML = "";
+        STEPS.forEach(name => {
+            const chip = document.createElement("span");
+            chip.className = "step-chip";
+            chip.id = "step-" + name;
+            chip.textContent = name;
+            box.appendChild(chip);
+        });
+    }
+
+    function activateStep(agent) {
+        // 把之前 active 的标记为 done
+        STEPS.forEach(name => {
+            const el = document.getElementById("step-" + name);
+            if (!el) return;
+            if (el.classList.contains("active")) {
+                el.classList.remove("active");
+                el.classList.add("done");
+                doneSteps.add(name);
+            }
+        });
+
+        // 尝试精确匹配
+        let matched = STEPS.find(s => agent.includes(s));
+        if (matched) {
+            const el = document.getElementById("step-" + matched);
+            if (el) el.classList.add("active");
+        }
+    }
+
+    function markStepDone(agent) {
+        let matched = STEPS.find(s => agent.includes(s));
+        if (matched) {
+            const el = document.getElementById("step-" + matched);
+            if (el) {
+                el.classList.remove("active");
+                el.classList.add("done");
+                doneSteps.add(matched);
+            }
+        }
+    }
+
+    function appendToken(text) {
+        const el = document.getElementById("stream-content");
+        el.textContent += text;
+        // 自动滚到底
+        const box = el.parentElement;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function updateProgress(done, total) {
+        const pct = total > 0 ? (done / total * 100) : 0;
+        document.getElementById("progress-fill").style.width = pct + "%";
+        document.getElementById("progress-text").textContent = `${done} / ${total}`;
+
+        if (done > 0 && totalStartTime > 0) {
+            const elapsedMs = Date.now() - totalStartTime;
+            const perCase = elapsedMs / done;
+            const remaining = (total - done) * perCase;
+            const etaMin = Math.ceil(remaining / 60000);
+            document.getElementById("progress-eta").textContent =
+                `ETA ~${etaMin} min`;
+        } else {
+            document.getElementById("progress-eta").textContent = "";
+        }
+    }
+
+    const VERDICT_CN = {'谣言':'谣言','大部分不实':'大部分不实','误导性信息':'误导性信息','部分属实':'部分属实','属实':'属实','无法核实':'无法核实'};
+    const CV_CLS = {'谣言':'cv-false','大部分不实':'cv-mostly-false','误导性信息':'cv-misleading','部分属实':'cv-partly-true','属实':'cv-true','无法核实':'cv-unverifiable'};
+    const SOURCE_TYPE_CN = {
+        official_government:'政府官方', regulator:'监管机构', fact_check_org:'辟谣机构',
+        hospital_medical:'医疗机构', academic:'学术机构', established_media:'权威媒体',
+        encyclopedia:'百科', blog_forum:'论坛', social_media:'社交', unknown:'未知'
+    };
+    const SOURCE_TYPE_CLS = {
+        official_government:'ev-type-gov', regulator:'ev-type-gov', fact_check_org:'ev-type-fc',
+        established_media:'ev-type-media', academic:'ev-type-media'
+    };
+
+    // 存储所有结果便于展开/收起
+    const allResults = {};
+
+    function addResultRow(d) {
+        const container = document.getElementById("results-body");
+        allResults[d.num] = d;
+
+        const tierIcon = {ok:'✓',caught:'✓',problematic:'✗',missed:'✗',uncertain:'~',timeout:'⏰',error:'⚠'}[d.tier]||'?';
+        const actualCls = (d.tier==='ok'||d.tier==='caught') ? 'cb-actual-ok' : (d.tier==='uncertain'?'cb-actual-unc':'cb-actual-bad');
+
+        const card = document.createElement("div");
+        card.className = `case-result-card tier-${d.tier}`;
+        card.id = `result-card-${d.num}`;
+
+        card.innerHTML = `
+            <div class="card-header" onclick="toggleCard(${d.num})">
+                <span class="card-num">#${d.num}</span>
+                <span class="card-tier-icon">${tierIcon}</span>
+                <span class="card-text-preview" title="${escHtml(d.full_text||d.text)}">${escHtml(d.full_text||d.text)}</span>
+                <div class="card-badges">
+                    <span class="card-badge cb-expected">期望 ${escHtml(d.expected||d.type)}</span>
+                    <span class="card-badge ${actualCls}">${escHtml(d.verdict)}</span>
+                </div>
+                <span class="card-time">${d.elapsed}s</span>
+                <span class="card-expand-icon">▸</span>
+            </div>
+            <div class="card-detail" id="detail-${d.num}"></div>
+        `;
+        container.appendChild(card);
+
+        // 如果有完整数据，预渲染
+        if (d.detail) renderDetail(d.num, d.detail);
+
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function toggleCard(num) {
+        const card = document.getElementById(`result-card-${num}`);
+        card.classList.toggle('expanded');
+    }
+
+    function renderDetail(num, detail) {
+        const el = document.getElementById(`detail-${num}`);
+        if (!detail) { el.innerHTML = '<div style="color:var(--text2);font-size:0.8rem;padding:8px">无详细数据（超时或错误）</div>'; return; }
+
+        let html = '';
+
+        // ── 摘要 + 回复 ──
+        if (detail.summary) {
+            html += `<div class="detail-section">
+                <div class="detail-section-title">核查结论</div>
+                <div class="detail-summary">${escHtml(detail.summary)}</div>
+            </div>`;
+        }
+        if (detail.friendly_reply) {
+            html += `<div class="detail-section">
+                <div class="detail-section-title">发给爸妈版</div>
+                <div class="detail-reply">${escHtml(detail.friendly_reply)}</div>
+            </div>`;
+        }
+
+        // ── 声明逐条 ──
+        const claims = detail.claims || [];
+        if (claims.length > 0) {
+            html += `<div class="detail-section"><div class="detail-section-title">声明拆解（${claims.length} 条）</div>`;
+            claims.forEach((c, ci) => {
+                const vCls = CV_CLS[c.verdict] || 'cv-unverifiable';
+                html += `<div class="claim-row">
+                    <span class="claim-verdict-chip ${vCls}">${escHtml(c.verdict)}</span>
+                    <div class="claim-body">
+                        <div class="claim-text-line">${escHtml(c.claim?.text || '')}</div>
+                        <div class="claim-conf">置信度 ${(c.confidence*100).toFixed(0)}%</div>
+                        ${c.reasoning ? `<div class="claim-reasoning">${escHtml(c.reasoning)}</div>` : ''}
+                    </div>
+                </div>`;
+
+                // 证据链
+                const evs = c.evidence_chain || [];
+                if (evs.length > 0) {
+                    evs.forEach(ev => {
+                        const evCls = ev.supports_claim===false ? 'ev-debunk' : ev.supports_claim===true ? 'ev-support' : '';
+                        const stCls = SOURCE_TYPE_CLS[ev.source_type] || '';
+                        const stCn = SOURCE_TYPE_CN[ev.source_type] || '未知';
+                        const stance = ev.supports_claim===false ? '反驳' : ev.supports_claim===true ? '支持' : '未定';
+                        const stanceCls = ev.supports_claim===false ? 'ev-stance-against' : ev.supports_claim===true ? 'ev-stance-support' : '';
+
+                        html += `<div class="evidence-item ${evCls}">
+                            <div class="ev-header">
+                                <span class="ev-source-name">${escHtml(ev.source)}</span>
+                                <span class="ev-type-tag ${stCls}">${stCn}</span>
+                                ${ev.authority_score ? `<span class="ev-authority">权威度 ${(ev.authority_score*100).toFixed(0)}%</span>` : ''}
+                                <span class="ev-stance ${stanceCls}">${stance}</span>
+                            </div>
+                            ${ev.title ? `<div class="ev-title">${escHtml(ev.title)}</div>` : ''}
+                            ${ev.snippet ? `<div class="ev-snippet">${escHtml(ev.snippet.substring(0, 200))}${ev.snippet.length>200?'...':''}</div>` : ''}
+                            ${ev.url ? `<a class="ev-url" href="${escHtml(ev.url)}" target="_blank">查看来源 →</a>` : ''}
+                        </div>`;
+                    });
+                }
+            });
+            html += '</div>';
+        }
+
+        // ── Agent 执行链 ──
+        const trace = detail.trace;
+        if (trace && trace.steps && trace.steps.length > 0) {
+            html += `<div class="detail-section">
+                <div class="detail-section-title">Agent 执行链（${trace.total_llm_calls || 0} 次 LLM · ${((trace.total_duration_ms||0)/1000).toFixed(1)}s）</div>`;
+            trace.steps.forEach(s => {
+                html += `<div class="trace-row">
+                    <span class="trace-agent">${escHtml(s.agent)}</span>
+                    <span class="trace-action">${escHtml(s.action)}</span>
+                    <span class="trace-dur">${s.duration_ms}ms</span>
+                </div>`;
+            });
+            html += '</div>';
+        }
+
+        // ── 决策诊断 ──
+        const diags = trace?.diagnostics || [];
+        if (diags.length > 0) {
+            html += `<div class="detail-section"><div class="detail-section-title">决策诊断链</div>`;
+            diags.forEach(diag => {
+                if (diag.decisions && diag.decisions.length > 0) {
+                    diag.decisions.forEach(dp => {
+                        if (!dp.fired) return;
+                        html += `<div class="trace-row">
+                            <span class="trace-agent">${escHtml(dp.stage)}</span>
+                            <span class="trace-action">${escHtml(dp.verdict_before||'—')} → ${escHtml(dp.verdict_after||'—')} ${dp.detail ? '| '+escHtml(dp.detail.substring(0,80)) : ''}</span>
+                        </div>`;
+                    });
+                }
+            });
+            html += '</div>';
+        }
+
+        // ── 原始 JSON（可折叠）──
+        html += `<div class="detail-section">
+            <span class="json-toggle" onclick="toggleJson(${num})">查看原始 JSON ▸</span>
+            <pre class="json-raw" id="json-${num}">${escHtml(JSON.stringify(detail, null, 2))}</pre>
+        </div>`;
+
+        el.innerHTML = html;
+    }
+
+    function toggleJson(num) {
+        const el = document.getElementById(`json-${num}`);
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function showSummary(d) {
+        const section = document.getElementById("summary-section");
+        section.style.display = "block";
+        const grid = document.getElementById("summary-grid");
+        grid.innerHTML = "";
+
+        const cards = [];
+
+        if (d.true_total != null) {
+            cards.push({ value: d.true_ok + "/" + d.true_total, label: "TRUE 通过", cls: "stat-green" });
+            cards.push({ value: (d.false_positive_rate * 100).toFixed(1) + "%", label: "误伤率", cls: "stat-red" });
+        }
+        if (d.false_total != null) {
+            cards.push({ value: d.false_caught + "/" + d.false_total, label: "FALSE 捕获", cls: "stat-green" });
+            cards.push({ value: (d.recall * 100).toFixed(1) + "%", label: "召回率", cls: "stat-blue" });
+        }
+        cards.push({ value: d.avg_time + "s", label: "平均耗时", cls: "stat-yellow" });
+        cards.push({ value: d.total, label: "总用例", cls: "" });
+
+        cards.forEach(c => {
+            const div = document.createElement("div");
+            div.className = "stat-card " + c.cls;
+            div.innerHTML = `<div class="value">${c.value}</div><div class="label">${c.label}</div>`;
+            grid.appendChild(div);
+        });
+    }
+
+    function escHtml(s) {
+        const d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    // ── 页面加载检查状态 ────────────────────────────────────
+    (async function checkStatus() {
+        try {
+            const res = await fetch("/api/benchmark/status");
+            const data = await res.json();
+            if (data.running) {
+                running = true;
+                document.getElementById("btn-start").disabled = true;
+                document.getElementById("status-dot").classList.add("running");
+                totalStartTime = Date.now();
+                connectSSE();
+            }
+        } catch(e) {}
+    })();
+    </script>
+</body>
+</html>
