@@ -1,0 +1,79 @@
+[
+  {
+    "id": "demo_policy",
+    "category": "政策法规",
+    "message": "紧急通知！国家刚出新规，从下个月起，所有银行存款超过5万元的要交20%的税！赶紧把钱取出来！",
+    "expected_verdict": "谣言",
+    "note": "典型政策类谣言。展示系统如何查gov.cn辟谣。"
+  },
+  {
+    "id": "demo_health",
+    "category": "健康养生",
+    "message": "医生都不告诉你的秘密：每天早上空腹喝一杯柠檬水加小苏打，可以杀死癌细胞！已经有无数人验证了！",
+    "expected_verdict": "谣言",
+    "note": "健康类伪科学。展示系统查WHO和卫健委。"
+  },
+  {
+    "id": "demo_scam",
+    "category": "诈骗套路",
+    "message": "恭喜你被选中！某某平台周年庆典，点击链接领取888元红包！名额有限，仅剩最后100个！ http://xxx.fake.com/hongbao",
+    "expected_verdict": "谣言",
+    "note": "诈骗链接。展示系统识别钓鱼特征。"
+  },
+  {
+    "id": "demo_screenshot",
+    "category": "伪造截图",
+    "message": "看群里转的这个微信公告截图：微信要开始收费了！每月收取9.9元使用费！下个月执行！",
+    "expected_verdict": "谣言",
+    "note": "展示系统对伪造截图的处理——查原始来源验证。"
+  },
+  {
+    "id": "demo_old_news",
+    "category": "旧闻翻炒",
+    "message": "太可怕了！某地化工厂刚刚发生大爆炸，现场浓烟滚滚！",
+    "expected_verdict": "误导性信息",
+    "note": "展示时间推理能力——Skeptic检测旧闻翻炒。"
+  },
+  {
+    "id": "demo_disaster",
+    "category": "灾难恐慌",
+    "message": "最新预警！国家地震局刚刚发布：今晚8点至明早6点，华北地区将发生7级以上大地震！所有人必须撤离到空旷地带！",
+    "expected_verdict": "谣言",
+    "note": "展示系统对灾难恐慌的处理——查应急管理部。"
+  },
+  {
+    "id": "demo_finance",
+    "category": "金融财经",
+    "message": "内幕消息！央行下周一宣布：人民币大幅贬值30%！赶紧把钱换成美元或黄金！过了这周就来不及了！",
+    "expected_verdict": "谣言",
+    "note": "展示金融谣言处理——查央行和证监会。"
+  },
+  {
+    "id": "demo_ai_quote",
+    "category": "AI名人语录",
+    "message": "马斯克最新发言：AI已经觉醒了，人类最多还有5年自由时间！他说完这话后直接辞去了特斯拉CEO职务！",
+    "expected_verdict": "谣言",
+    "note": "展示AI名人语录场景——查原始采访记录验证。"
+  },
+  {
+    "id": "demo_multi_claim",
+    "category": "政策法规",
+    "message": "转发！三条重要通知：1. 存款超5万要交税！2. 医保卡下月停用，必须点链接重新认证！3. 高度白酒能预防流感，专家推荐每天二两！",
+    "expected_verdict": "谣言",
+    "note": "亮点case：多claim混合型。展示系统逐条提取、并行核查、分别判定的能力。三条分别命中政策/诈骗/健康场景。"
+  },
+  {
+    "id": "demo_old_news_recycled",
+    "category": "旧闻翻炒",
+    "message": "刚刚！天津港又发生大爆炸！！！现场火光冲天，已经有上千人受伤！大家千万不要靠近滨海新区！！！",
+    "expected_verdict": "谣言",
+    "note": "旧闻翻炒case：天津港爆炸是2015年的事，用"刚刚"制造时间错位。展示Skeptic对时间线的质疑能力。"
+  },
+  {
+    "id": "demo_health_panic",
+    "category": "健康养生",
+    "message": "紧急扩散！！！国际权威机构刚刚证实：自来水中含有大量致癌物质氯仿！长期饮用等于慢性自杀！必须立刻停止喝自来水！转发救人一命！！",
+    "expected_verdict": "谣言",
+    "note": "健康恐慌case：用夸大的语言+虚假权威背书制造恐慌。展示系统识别煽动性表述+查WHO/卫健委实际标准。"
+  }
+]

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate TruthNote Icons</title></head>
+<body>
+<h2>右键每张图 → 另存为对应文件名到 extension/icons/</h2>
+<div id="output"></div>
+<script>
+const sizes = [16, 32, 48, 128, 512];
+const svg = `<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="black"/>
+<path d="M443 65H59V191.83H192V449L320 448V191.83L443 191.83V65Z" fill="white"/>
+<rect x="108" y="96" width="72" height="72" fill="black"/>
+<rect x="332" y="96" width="72" height="72" fill="black"/>
+</svg>`;
+
+const blob = new Blob([svg], {type: 'image/svg+xml'});
+const url = URL.createObjectURL(blob);
+
+sizes.forEach(size => {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, size, size);
+    const png = canvas.toDataURL('image/png');
+    const el = document.createElement('div');
+    el.style.margin = '10px';
+    el.innerHTML = `<p>icon${size}.png (${size}×${size})</p><img src="${png}" width="${size}" height="${size}" style="border:1px solid #ccc">
+    <br><a href="${png}" download="icon${size}.png">下载 icon${size}.png</a>`;
+    document.getElementById('output').appendChild(el);
+  };
+  img.src = url;
+});
+</script>
+</body>
+</html>

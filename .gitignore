@@ -1,0 +1,28 @@
+__pycache__/
+*.pyc
+.pipeline/
+*.egg-info/
+dist/
+build/
+.venv/
+.env
+node_modules/
+vertex-key.json
+
+# 数据集与评测语料：外部事实核查语料(CHEF/candy) + 评测块，运行时不加载、非产品代码、
+# 含敏感政治谣言文本，不入交付代码包（2026-05-29 改：本地磁盘保留，仅停止 git 跟踪）。
+data/
+CHEF/
+
+# 内部工作笔记（副线分析/设计卡），含敏感举例，非产品交付物。
+副线工作区/
+
+# 一次性诊断/实验脚本（throwaway），不入仓也不进 lint
+tmp/
+
+# demo 舞台的 SingleFile 原始存档（真平台页 dump，单个最大 48MB，共 ~63MB）：
+# 它们只是 d:/tmp/transform_*.py 的中间输入，交付物是已生成的 demo舞台/*.html。
+# 本地保留以便重跑 transform，但绝不入 git 历史（否则永久膨胀 63MB，难撤销）。
+/*.htm
+# 误粘进根目录的临时截图，非交付物
+/image.png

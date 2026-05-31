@@ -1,0 +1,15 @@
+fastapi>=0.115
+uvicorn[standard]>=0.34
+openai>=1.82
+anthropic>=0.52
+pydantic>=2.11
+pydantic-settings>=2.9
+httpx>=0.28
+python-dotenv>=1.1
+PicImageSearch>=3.12
+
+# dev
+pytest>=8.3
+pytest-asyncio>=0.25
+pytest-cov>=6.1
+ruff>=0.11

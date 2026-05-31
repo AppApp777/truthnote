@@ -1,0 +1,26 @@
+[project]
+name = "wenke-song"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# docs/ 放的是文档与「施工件」（给主力复制粘贴的代码片段、补丁草稿，含故意非模块的
+# 片段）；不当产品代码 lint。一旦复制进 src/ 即在 src/ 严格受检。
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+# scripts/ 与 tools/ 都是数据管线 / demo / 一次性调试脚本（非 src/ 产品代码）：
+# 放宽行长（中文字符串易超）、文件上下文管理器、循环变量未用等风格项，
+# 但保留 F（真 bug：未用导入/未定义名）全量强制。src/ 与 tests/ 仍严格。
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["E501", "SIM115", "SIM105", "B007", "E741", "UP031"]
+"tools/*" = ["E501", "SIM115", "SIM105", "B007", "E741", "UP031"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]

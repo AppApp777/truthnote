@@ -1,0 +1,1749 @@
+/* ============================================================
+   TruthNote 卡片渲染样式
+   通用：所有 RenderEngine 渲染的卡片都用这套类名
+   配色：遵循设计规范（纯矩形/直角/黑白主色 + 三色判定）
+   动画：入场淡入+上滑，列表项错错入场（stagger）
+   ============================================================ */
+
+/* ===== 卡片骨架 ===== */
+.tn-card {
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #1A1A1A;
+  position: relative;
+}
+
+/* 入场动效：轻轻落到桌面后稳住（translateY + 极轻 scale，expo-out 曲线） */
+.tn-card--enter {
+  opacity: 0;
+  transform: translateY(6px) scale(0.985);
+}
+.tn-card--active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity var(--tn-mo-enter) ease-out,
+              transform var(--tn-mo-enter) var(--tn-ease-enter);
+}
+
+/* 静置阴影微澜：落定后的过程卡极缓"呼吸"。用 ::after 的 opacity 动画（合成器层，
+   每帧零重绘）让阴影深浅起伏；--i 负 delay 打散相位，8 张卡像一池微风静水。
+   final 卡不参与（它有 final-ring + 判定色 glow，避免过载）。 */
+.tn-card--active:not(.tn-card--final)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.09);
+  opacity: 0;
+  animation: tn-card-rest var(--tn-mo-cardrest) var(--tn-ease-sine) infinite;
+  animation-delay: calc(var(--i, 0) * -1.3s);
+}
+@keyframes tn-card-rest {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 1; }
+}
+
+/* flavor 色调：左侧 2px 竖线 */
+.tn-card::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: 3px;
+  background: #BBBBBB;
+}
+.tn-card--default::before  { background: #BBBBBB; }
+.tn-card--neutral::before  { background: #999999; }
+.tn-card--primary::before  { background: #000000; }
+.tn-card--search::before   { background: #555555; }
+.tn-card--verify::before   { background: #333333; }
+.tn-card--compose::before  { background: #000000; }
+.tn-card--error::before    { background: #F43939; }
+
+/* ===== 卡片头部 ===== */
+.tn-card-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.tn-card-dot {
+  width: 8px;
+  height: 8px;
+  background: #BBBBBB;
+  flex-shrink: 0;
+}
+.tn-card-dot--neutral { background: #999999; }
+.tn-card-dot--primary { background: #000000; }
+.tn-card-dot--search  { background: #555555; }
+.tn-card-dot--verify  { background: #333333; }
+.tn-card-dot--compose { background: #000000; }
+.tn-card-dot--error   { background: #F43939; animation: tn-shake 360ms ease-out; }
+
+.tn-card-title {
+  font-weight: 600;
+  font-size: 12px;
+  color: #000;
+}
+
+.tn-card-sub {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 9px;            /* 补充修饰（Agent 技术名）退到最次要，给中文标题让位 */
+  color: #999;
+}
+
+.tn-card-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 9px;            /* 耗时/相对时间同属补充修饰，压到 9px */
+  color: #999;
+}
+.tn-card-dur { color: #666; font-weight: 500; }
+.tn-card-time { color: #BBB; }
+
+/* ===== 副标题（human_narrative）—— 次要解说，缩小压暗给重要信息让位 ===== */
+.tn-card-narrative {
+  font-size: 11px;
+  color: #6A6A6A;
+  margin: 2px 0 6px;
+  line-height: 1.5;
+}
+
+.tn-card-body { }
+
+.tn-card-empty {
+  font-size: 11px;
+  color: #888;
+  padding: 4px 0;
+  font-style: italic;
+}
+
+/* ===== Key-Value 行（generic） ===== */
+.tn-kv {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  padding: 2px 0;
+}
+.tn-kv-k {
+  color: #999;
+  flex-shrink: 0;
+  min-width: 40px;
+  font-family: ui-monospace, monospace;
+}
+.tn-kv-v {
+  color: #333;
+  word-break: break-word;
+}
+
+/* ===== 错错入场动画（列表项） ===== */
+.tn-stagger {
+  opacity: 0;
+  transform: translateX(-4px);
+  animation: tn-stagger-in 240ms var(--tn-ease-enter) forwards;
+  animation-delay: calc(var(--i, 0) * var(--tn-stagger-step) + 80ms);
+}
+
+@keyframes tn-stagger-in {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tn-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+/* ============================================================
+   模板：claim_list
+   ============================================================ */
+.tn-claim-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+}
+.tn-claim-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #F0F0F0;
+}
+.tn-claim-item:last-child { border-bottom: none; }
+.tn-claim-num {
+  width: 14px;
+  height: 14px;
+  background: #000;
+  color: #FFF;
+  font-size: 9px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: center;
+}
+.tn-claim-text {
+  flex: 1;
+  font-size: 13.5px;       /* 声明=本卡最重要信息，加大加重，明显高于解说词(11px) */
+  font-weight: 600;
+  color: #000;
+  line-height: 1.45;
+}
+/* 分类标签：纯文字小标注，去掉边框+底色——别让用户误以为是可点按钮 */
+.tn-claim-tag {
+  font-size: 9px;
+  padding: 0;
+  background: transparent;
+  color: #B0B0B0;
+  border: none;
+  flex-shrink: 0;
+  align-self: center;
+}
+/* 图片溯源：被核查图的小缩略图（限高 72px 不占大版面） */
+.tn-claim-thumb {
+  margin: 0 0 8px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.tn-claim-thumb-img {
+  max-height: 72px;
+  max-width: 100%;
+  object-fit: cover;
+  border: 1px solid #DDD;
+  display: block;
+}
+.tn-claim-thumb-cap {
+  font-size: 10px;
+  color: #999;
+}
+.tn-claim-badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  background: #000;
+  color: #FFF;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   模板：evidence_list
+   ============================================================ */
+.tn-query-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #F0F0F0;
+}
+.tn-query-label {
+  font-size: 10px;
+  color: #999;
+  margin-right: 4px;
+}
+.tn-query-chip {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: #F5F5F5;
+  color: #333;
+  border: 1px solid #E5E5E5;
+  font-family: ui-monospace, monospace;
+}
+
+.tn-evidence-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tn-evidence-item {
+  padding: 6px 0;
+  border-bottom: 1px dashed #F0F0F0;
+}
+.tn-evidence-item:last-child { border-bottom: none; }
+/* 序号盒与标题首行对齐：flex-start 让它们顶部齐平，再用 margin-top 把 14px 方块压到首行行高(≈17.5px)正中 */
+.tn-evidence-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.tn-evidence-idx {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #000;
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+/* 证据标题 = 这张卡最重要的信息：放大加粗加黑，明确高于解说词/摘要/徽章 */
+.tn-evidence-title {
+  font-size: 12.5px;
+  color: #161616;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: color 150ms;
+}
+a.tn-evidence-title:hover {
+  color: #000;
+  text-decoration: underline;
+}
+.tn-evidence-source {
+  font-size: 9px;
+  color: #999;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+/* 摘要 = 次要佐证：缩小压灰，给标题让位，整卡形成清晰扫读层级 */
+.tn-evidence-snippet {
+  font-size: 10.5px;
+  color: #8A8A8A;
+  line-height: 1.45;
+  padding-left: 20px;
+}
+
+/* ============================================================
+   模板：verification_grid
+   ============================================================ */
+.tn-verify-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tn-verify-item {
+  padding: 6px 0;
+  border-bottom: 1px dashed #F0F0F0;
+}
+.tn-verify-item:last-child { border-bottom: none; }
+.tn-verify-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.tn-verify-claim {
+  flex: 1;
+  font-size: 11px;
+  color: #1A1A1A;
+}
+.tn-verify-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+.tn-verify-sign {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+}
+.tn-verify-verdict--true {
+  background: rgba(62,207,114,0.12);
+  color: #2A8F4F;
+  border: 1px solid rgba(62,207,114,0.3);
+}
+.tn-verify-verdict--false {
+  background: rgba(244,57,57,0.12);
+  color: #C72020;
+  border: 1px solid rgba(244,57,57,0.3);
+}
+.tn-verify-verdict--warn {
+  background: rgba(255,176,32,0.15);
+  color: #A26800;
+  border: 1px solid rgba(255,176,32,0.35);
+}
+.tn-verify-verdict--unverified {
+  background: #F5F5F5;
+  color: #666;
+  border: 1px solid #E5E5E5;
+}
+.tn-verify-conf {
+  font-size: 10px;
+  color: #999;
+  font-family: ui-monospace, monospace;
+  flex-shrink: 0;
+}
+.tn-verify-reason {
+  font-size: 11px;
+  color: #555;
+  padding-left: 4px;
+  border-left: 2px solid #EEE;
+  margin-left: 2px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   真联网取证徽章（evidence_list 顶部）——把"真的去搜了"摆台面上
+   蓝色信号（非三色判定色，避免与 verdict 混淆）+ 脉冲点 = "live"
+   ============================================================ */
+.tn-ev-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 6px;
+  padding: 2px 7px;
+  background: rgba(74,144,217,0.08);
+  border: 1px solid rgba(74,144,217,0.3);
+  font-size: 9px;
+  color: #2C6FB0;
+  font-weight: 600;
+}
+.tn-ev-live-dot {
+  width: 6px;
+  height: 6px;
+  background: #4A90D9;       /* 方块——遵循"纯矩形直角"设计规范，唯一圆形是字母 o */
+  flex-shrink: 0;
+  animation: tn-ev-live-pulse 1.4s ease-in-out infinite;
+}
+@keyframes tn-ev-live-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74,144,217,0.5); }
+  50%      { opacity: 0.6; box-shadow: 0 0 0 4px rgba(74,144,217,0); }
+}
+.tn-ev-live-label {
+  flex: 1;
+  white-space: nowrap;
+}
+.tn-ev-live-count {
+  color: #6699CC;
+  font-weight: 500;
+  padding-left: 6px;
+  font-size: 9px;
+  border-left: 1px solid rgba(74,144,217,0.3);
+}
+/* 「抓取 N 个网页」可点开/折叠 */
+.tn-ev-live-toggle {
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  color: #2C6FB0;
+  background: transparent;
+  border: none;
+  border-left: 1px solid rgba(74,144,217,0.3);
+  padding: 0 0 0 6px;
+  margin-left: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tn-ev-live-toggle:hover { color: #1A4F8A; text-decoration: underline; }
+
+/* 检索到的网页列表（证明"真取证"——评委一眼看到真实域名） */
+.tn-ev-pages {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  background: rgba(74,144,217,0.05);
+  border: 1px solid rgba(74,144,217,0.18);
+  border-left: 3px solid #4A90D9;
+  max-height: 132px;
+  overflow-y: auto;
+}
+.tn-ev-pages.is-collapsed { display: none; }
+.tn-ev-page {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.tn-ev-page-host {
+  flex-shrink: 0;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: #2C6FB0;
+  background: rgba(74,144,217,0.12);
+  padding: 0 4px;
+  text-decoration: none;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 整行点击区：包住域名+标题，点哪都能开真网页（host+title 在一个 <a> 里） */
+.tn-ev-page-link {
+  flex: 1;
+  min-width: 0;            /* 让内部标题的 ellipsis 生效 */
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tn-ev-page-link:hover .tn-ev-page-host { background: rgba(74,144,217,0.25); }
+.tn-ev-page-link:hover .tn-ev-page-title { color: #2C6FB0; text-decoration: underline; }
+.tn-ev-page-title {
+  flex: 1;
+  color: #555;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tn-ev-page--kept .tn-ev-page-title { color: #1A1A1A; font-weight: 500; }
+.tn-ev-page-kept {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  color: #2A8F4F;
+  background: rgba(62,207,114,0.15);
+  padding: 0 4px;
+}
+
+/* ============================================================
+   模板：evidence_relations（标关系）——每条证据 vs 声明的关系
+   ============================================================ */
+.tn-rel-claim {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.tn-rel-claim-tag {
+  font-size: 9px;
+  font-weight: 700;
+  color: #FFF;
+  background: #000;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+.tn-rel-claim-text {
+  font-size: 11px;
+  color: #1A1A1A;
+  line-height: 1.4;
+}
+.tn-rel-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* 多声明分组：第二条声明的关系块与上一组之间留白 + 分隔线，分得清是两条声明 */
+.tn-rel-group + .tn-rel-group {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #ECECEC;
+}
+.tn-rel-item {
+  padding: 10px 0;            /* was 6px —— 用户嫌挤，加大每条证据关系的上下间隔 */
+  border-bottom: 1px dashed #F0F0F0;
+}
+.tn-rel-item:last-child { border-bottom: none; }
+.tn-rel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;        /* was 2px —— 来源行与下方说明之间也松一点 */
+}
+.tn-rel-src {
+  font-size: 11px;
+  color: #444;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 统一板块大小：定宽 + 文字居中，所有关系徽章右侧对齐成齐整一列 */
+.tn-rel-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 72px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+.tn-rel-badge--false      { background: rgba(244,57,57,0.12); color: #C72020; border: 1px solid rgba(244,57,57,0.3); }
+.tn-rel-badge--warn       { background: rgba(255,176,32,0.15); color: #A26800; border: 1px solid rgba(255,176,32,0.35); }
+.tn-rel-badge--true       { background: rgba(62,207,114,0.12); color: #2A8F4F; border: 1px solid rgba(62,207,114,0.3); }
+.tn-rel-badge--neutral    { background: #F0F0F0; color: #666; border: 1px solid #E0E0E0; }
+.tn-rel-badge--muted      { background: #F7F7F7; color: #AAA; border: 1px solid #EEE; }
+.tn-rel-note {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.5;
+  padding-left: 4px;
+  border-left: 2px solid #EEE;
+  margin-left: 2px;
+}
+
+/* ============================================================
+   模板：rule_verdict（规则裁决，零-LLM）——判定靠规则不靠模型
+   ============================================================ */
+.tn-rv-engine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 2px 7px;
+  background: #1A1A1A;
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.tn-rv-engine-dot {
+  width: 6px;
+  height: 6px;
+  background: #FFF;
+  flex-shrink: 0;
+}
+.tn-rv-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.tn-rv-rule {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;       /* 命中规则文字水平居中 */
+  justify-content: center;   /* 与判定框等高时垂直居中 */
+  text-align: center;
+  gap: 2px;
+  padding: 6px 8px;
+  background: #F7F7F7;
+  border: 1px solid #E5E5E5;
+}
+.tn-rv-rule-label {
+  font-size: 9px;
+  color: #999;
+  font-weight: 600;
+}
+.tn-rv-rule-text {
+  font-size: 11px;
+  color: #1A1A1A;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.tn-rv-arrow {
+  align-self: center;
+  font-size: 16px;
+  color: #000;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.tn-rv-verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 10px;
+  flex-shrink: 0;
+  min-width: 64px;
+}
+.tn-rv-verdict-zh { font-size: 13px; font-weight: 700; }
+.tn-rv-verdict-pri { font-size: 9px; opacity: 0.7; font-family: ui-monospace, monospace; }
+.tn-rv-verdict--false      { background: rgba(244,57,57,0.12); color: #C72020; border: 1px solid rgba(244,57,57,0.35); }
+.tn-rv-verdict--warn       { background: rgba(255,176,32,0.15); color: #A26800; border: 1px solid rgba(255,176,32,0.4); }
+.tn-rv-verdict--true       { background: rgba(62,207,114,0.12); color: #2A8F4F; border: 1px solid rgba(62,207,114,0.35); }
+.tn-rv-verdict--unverified { background: #F5F5F5; color: #666; border: 1px solid #E5E5E5; }
+.tn-rv-detail {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+  padding-left: 4px;
+  border-left: 2px solid #EEE;
+  margin: 4px 0 4px 2px;
+}
+.tn-rv-note {
+  font-size: 10px;
+  color: #999;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ============================================================
+   模板：reply_draft
+   ============================================================ */
+.tn-reply-box {
+  background: #FAFFF8;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #1A1A1A;
+  position: relative;
+  margin: 4px 0;
+}
+.tn-reply-quote {
+  font-size: 18px;
+  color: #3ECF72;
+  font-weight: 700;
+  font-family: serif;
+  vertical-align: -2px;
+  margin-right: 2px;
+}
+.tn-reply-quote--end {
+  margin-left: 2px;
+  margin-right: 0;
+}
+.tn-reply-text {
+  color: #1A1A1A;
+}
+.tn-reply-meta {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #999;
+}
+
+/* 写报告·结论形态：板上钉钉一句话（为什么不实），干净浅底块，无左竖条 */
+.tn-verdict-conclusion {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+  line-height: 1.7;
+  padding: 10px 12px;
+  background: #FAFAFA;
+}
+/* 社会辟谣库登记说明（如以静态文字形态出现时用；当前社会库走闭环按钮，此块可备用） */
+.tn-verdict-registry {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.tn-verdict-registry-tag {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  color: #FFF;
+  background: #1A1A1A;
+  padding: 1px 5px;
+}
+.tn-verdict-registry-text { color: #555; }
+
+/* ============================================================
+   模板：dimension_radar（演示杀器，6 维度网格）
+   ============================================================ */
+.tn-dim-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 12px;
+  margin-top: 4px;
+}
+.tn-dim-cell {
+  font-size: 11px;
+}
+.tn-dim-question {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.tn-dim-bar {
+  height: 4px;
+  background: #F0F0F0;
+  overflow: hidden;
+}
+.tn-dim-bar-fill {
+  height: 100%;
+  width: 100%;                 /* 满宽，用 scaleX 表达数值（合成器层，无 reflow） */
+  background: #666;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 600ms var(--tn-ease-enter);
+}
+/* 长到位后静置：灰条 ±7% 明度流动（filter 走合成层、不引入色相，守灰阶铁律） */
+.tn-dim-bar-fill.is-settled {
+  animation: tn-bar-lumen var(--tn-mo-lumen) var(--tn-ease-sine) infinite;
+}
+@keyframes tn-bar-lumen {
+  0%, 100% { filter: brightness(0.94); }
+  50%      { filter: brightness(1.08); }
+}
+/* 倾向：浅色胶囊背景 + 黑字 —— 颜色由背景柔和承载，字号加大 */
+.tn-dim-lean {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 6px;
+  padding: 2px 8px;
+  color: #1A1A1A;
+  background: #F0F0F0;
+}
+.tn-dim-lean--false       { background: rgba(244,57,57,0.15); }
+.tn-dim-lean--warn        { background: rgba(255,176,32,0.20); }
+.tn-dim-lean--true        { background: rgba(62,207,114,0.18); }
+.tn-dim-lean--unverified  { background: #F0F0F0; }
+
+/* ----- verdict 概率分布（dimension_radar 顶部，演示杀器） ----- */
+.tn-vdist {
+  margin-bottom: 2px;
+  /* 底部分隔线去掉——综合判定卡下方没有内容，这条线是多余的设计噪声 */
+}
+.tn-vdist-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #999;
+  margin-bottom: 8px;
+}
+.tn-vdist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.tn-vdist-label {
+  flex: 0 0 64px;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+.tn-vdist-bar {
+  flex: 1 1 auto;
+  height: 8px;
+  background: #F0F0F0;
+  overflow: hidden;
+  border-radius: 1px;
+}
+.tn-vdist-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: #C8C8C8;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 700ms var(--tn-ease-enter);
+}
+.tn-vdist-bar-fill.is-settled {
+  animation: tn-bar-lumen var(--tn-mo-lumen) var(--tn-ease-sine) infinite;
+}
+.tn-vdist-pct {
+  flex: 0 0 36px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #999;
+  text-align: right;
+}
+/* 颜色只编码判定：红/黄/绿/灰 —— 仅最大项满强度，其余维持灰阶克制 */
+.tn-vdist-row--false  .tn-vdist-bar-fill { background: rgba(244,57,57,0.45); }
+.tn-vdist-row--warn   .tn-vdist-bar-fill { background: rgba(255,176,32,0.50); }
+.tn-vdist-row--true   .tn-vdist-bar-fill { background: rgba(62,207,114,0.45); }
+.tn-vdist-row--top.tn-vdist-row--false  .tn-vdist-bar-fill { background: #F43939; }
+.tn-vdist-row--top.tn-vdist-row--warn   .tn-vdist-bar-fill { background: #FFB020; }
+.tn-vdist-row--top.tn-vdist-row--true   .tn-vdist-bar-fill { background: #3ECF72; }
+.tn-vdist-row--top.tn-vdist-row--unverified .tn-vdist-bar-fill { background: #999; }
+.tn-vdist-row--top .tn-vdist-label { color: #1A1A1A; font-weight: 700; }
+.tn-vdist-row--top .tn-vdist-pct   { color: #1A1A1A; font-weight: 700; }
+
+/* ============================================================
+   模板：query_plan（查询词 chips + 策略行）
+   ============================================================ */
+.tn-qp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.tn-qp-chip {
+  font-size: 11px;
+  padding: 3px 8px 3px 6px;
+  background: #FFF;
+  color: #1A1A1A;
+  border: 1px solid #DDD;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: border-color 150ms;
+}
+.tn-qp-chip:hover {
+  border-color: #000;
+}
+.tn-qp-chip::before {
+  content: "#";
+  color: #999;
+  font-weight: 700;
+  font-size: 10px;
+}
+.tn-qp-strategy {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #EEE;
+  font-size: 10px;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   模板：evidence_rank（Top N 证据可信度条形图）
+   ============================================================ */
+.tn-er-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+}
+.tn-er-item {
+  padding: 5px 0;
+  border-bottom: 1px dashed #F0F0F0;
+}
+.tn-er-item:last-child { border-bottom: none; }
+.tn-er-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+/* 序号/来源/分数同号(12px) + baseline 对齐：数字与文字大小一致、上下齐平 */
+.tn-er-rank {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  width: 24px;
+  flex-shrink: 0;
+}
+.tn-er-src {
+  flex: 1;
+  font-size: 12px;
+  color: #1A1A1A;
+  font-weight: 500;
+}
+.tn-er-score {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.tn-er-bar-wrap {
+  height: 5px;
+  background: #F0F0F0;
+  overflow: hidden;
+}
+.tn-er-bar {
+  height: 100%;
+  width: 100%;
+  background: #000;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 500ms var(--tn-ease-enter);
+}
+.tn-er-bar.is-settled {
+  animation: tn-bar-lumen 6.5s var(--tn-ease-sine) infinite;
+}
+
+/* ============================================================
+   模板：skeptic_challenges（自我质疑 Q&A）
+   ============================================================ */
+.tn-sk-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+}
+.tn-sk-item {
+  margin-bottom: 10px;
+  padding: 0;
+}
+.tn-sk-item:last-child { margin-bottom: 0; }
+
+.tn-sk-q {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.tn-sk-qmark {
+  width: 14px;
+  height: 14px;
+  background: #000;
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: center;
+}
+.tn-sk-qtext {
+  font-size: 12px;
+  color: #1A1A1A;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.tn-sk-a {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+  padding-left: 20px;
+  position: relative;
+}
+.tn-sk-a::before {
+  content: "→";
+  position: absolute;
+  left: 6px;
+  color: #000;
+  font-weight: 700;
+}
+.tn-sk-conclusion {
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: #F5F5F5;
+  font-size: 11px;
+  color: #1A1A1A;
+  font-weight: 500;
+}
+
+/* ============================================================
+   模板：final_verdict（done 之后追加到卡片瀑布末尾，给出最终结论 + 温和回复）
+   ============================================================ */
+.tn-card--final {
+  background: linear-gradient(180deg, #FAFAFA 0%, #FFFFFF 100%);
+  border: 1px solid #000;
+  padding: 12px 14px;
+  margin-top: 12px;
+  position: relative;
+}
+.tn-card--final::before {
+  background: #000;
+  width: 4px;
+}
+.tn-card--final .tn-card-dot--final {
+  width: 10px;
+  height: 10px;
+  background: #000;
+  position: relative;
+}
+.tn-card--final .tn-card-dot--final::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1px solid #000;
+  opacity: 0.4;
+  animation: tn-final-ring 3s ease-out infinite;
+}
+/* final 卡郑重落地：比过程卡更慢更沉（360ms），覆盖 .tn-card--active 的 240ms */
+.tn-card--final.tn-card--enter {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+}
+.tn-card--final.tn-card--active {
+  transition: opacity var(--tn-mo-final) ease-out,
+              transform var(--tn-mo-final) var(--tn-ease-enter);
+}
+@keyframes tn-final-ring {
+  0%   { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+.tn-card--final .tn-card-title {
+  font-size: 13px;
+}
+
+/* ===== 二元真/假前置 banner（结论卡最前，产品要"确定真/假"） ===== */
+.tn-final-binary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 8px 0 10px;
+  border: 1px solid;
+}
+/* 去掉「大红底」：banner 改干净白底 + 细边框，判定靠「不实/属实」文字颜色编码 */
+.tn-final-binary--false      { background: #FFFFFF; border-color: rgba(244,57,57,0.5); }
+.tn-final-binary--true       { background: #FFFFFF; border-color: rgba(62,207,114,0.55); }
+.tn-final-binary--unverified { background: #FFFFFF; border-color: #DDD; }
+.tn-final-binary-stamp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  color: #FFF;
+  /* 印章砸下：放大回弹 */
+  animation: tn-binary-stamp 420ms var(--tn-ease-enter, cubic-bezier(0.34,1.56,0.64,1)) both;
+}
+.tn-final-binary--false .tn-final-binary-stamp      { background: #F43939; }
+.tn-final-binary--true .tn-final-binary-stamp       { background: #3ECF72; color: #06351A; }
+.tn-final-binary--unverified .tn-final-binary-stamp { background: #B8B8B8; }
+@keyframes tn-binary-stamp {
+  0%   { opacity: 0; transform: scale(1.6); }
+  60%  { opacity: 1; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.tn-final-binary-sign {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+.tn-final-binary-big {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.tn-final-binary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tn-final-binary-zh {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+.tn-final-binary--false .tn-final-binary-zh { color: #C72020; }
+.tn-final-binary--true .tn-final-binary-zh  { color: #2A8F4F; }
+.tn-final-binary-sub {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.4;
+}
+/* 诚实限定条（图片溯源场景）：紧贴 banner 下方，琥珀色提示"图真·假的只是时间"，不被读成"图判假" */
+.tn-final-headnote {
+  font-size: 11px;
+  color: #8A5A00;
+  background: rgba(255,176,32,0.12);
+  border-left: 2px solid #FFB020;
+  padding: 5px 9px;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+
+.tn-final-original {
+  background: #F5F5F5;
+  border-left: 2px solid #BBB;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+  margin: 6px 0 10px;
+  max-height: 56px;
+  overflow: hidden;
+}
+
+.tn-final-section {
+  margin-bottom: 10px;
+}
+.tn-final-section:last-child { margin-bottom: 0; }
+
+.tn-final-section-title {
+  font-size: 10px;
+  color: #999;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.tn-final-claims {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tn-final-claim {
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: #FAFAFA;
+}
+.tn-final-claim:last-child { margin-bottom: 0; }
+.tn-final-claim--false { background: rgba(244,57,57,0.05); }
+.tn-final-claim--true { background: rgba(62,207,114,0.06); }
+.tn-final-claim--unverified { background: rgba(255,176,32,0.06); }
+
+.tn-final-claim-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.tn-final-claim-num {
+  width: 16px;
+  height: 16px;
+  background: #000;
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tn-final-claim-text {
+  flex: 1;
+  font-size: 12px;
+  color: #1A1A1A;
+}
+.tn-final-claim-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+.tn-final-claim-tag--false { background: #F43939; color: #FFF; }
+.tn-final-claim-tag--true { background: #3ECF72; color: #000; }
+.tn-final-claim-tag--unverified { background: #FFB020; color: #000; }
+
+/* 全系统唯一允许的"判定色发光"：仅 final 卡判定胶囊，极缓 4s glow、无位移、峰值 alpha 0.28（"轻轻发烫"非霓虹） */
+.tn-final-claim-tag--true     { animation: tn-glow-true var(--tn-mo-glow) var(--tn-ease-sine) infinite; }
+.tn-final-claim-tag--false    { animation: tn-glow-false var(--tn-mo-glow) var(--tn-ease-sine) infinite; }
+.tn-final-claim-tag--unverified { animation: tn-glow-unv var(--tn-mo-glow) var(--tn-ease-sine) infinite; }
+@keyframes tn-glow-true {
+  0%,100% { box-shadow: 0 0 0 0 rgba(62,207,114,0); }
+  50%     { box-shadow: 0 0 8px 1px rgba(62,207,114,0.28); }
+}
+@keyframes tn-glow-false {
+  0%,100% { box-shadow: 0 0 0 0 rgba(244,57,57,0); }
+  50%     { box-shadow: 0 0 8px 1px rgba(244,57,57,0.28); }
+}
+@keyframes tn-glow-unv {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,176,32,0); }
+  50%     { box-shadow: 0 0 8px 1px rgba(255,176,32,0.28); }
+}
+
+.tn-final-claim-ev {
+  margin-top: 4px;
+  padding-left: 22px;
+  font-size: 11px;
+}
+.tn-final-claim-link {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+  line-height: 1.4;
+  display: inline-block;
+  border-bottom: 1px solid #000;
+}
+.tn-final-claim-link:hover { background: #F5F5F5; }
+.tn-final-claim-snippet {
+  color: #666;
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.tn-final-claim-reason {
+  margin-top: 4px;
+  padding-left: 22px;
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* 无法核实·细化归因常驻块：颜色统一灰（与 tn-final-original 同灰阶），7 类只在文案区分 */
+.tn-uvreason {
+  margin-top: 6px;
+  margin-left: 22px;
+  background: #F5F5F5;
+  border-left: 2px solid #BBB;
+  padding: 6px 9px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.tn-uvreason-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.tn-uvreason-tag {
+  font-size: 9.5px;
+  color: #FFF;
+  background: #999;
+  padding: 1px 6px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.tn-uvreason-code {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+}
+.tn-uvreason-detail {
+  color: #555;
+}
+.tn-uvreason-blocked {
+  margin-top: 4px;
+  background: #ECECEC;
+  border-left: 2px solid #999;
+  padding: 4px 8px;
+  color: #444;
+}
+.tn-uvreason-blocked-label {
+  font-weight: 600;
+  color: #333;
+}
+.tn-uvreason-where {
+  margin-top: 4px;
+  font-size: 10.5px;
+  color: #888;
+}
+.tn-uvreason-where-label {
+  font-weight: 600;
+  color: #666;
+}
+
+/* ============================================================
+   闭环动作（把结果真正给用户用起来——产品定义的闭环）
+   ============================================================ */
+.tn-actions-section .tn-final-section-title::before {
+  content: "▸ ";
+  color: #000;
+}
+.tn-action-box {
+  border: 1px solid #E5E5E5;
+  background: #FCFCFC;
+  padding: 8px 10px;
+  margin-top: 6px;
+}
+.tn-action-box + .tn-action-box { margin-top: 8px; }
+
+/* 可分享纠正卡 */
+.tn-action-cc {
+  margin-bottom: 8px;
+}
+.tn-action-cc-text {
+  font-size: 11px;
+  color: #333;
+  line-height: 1.6;
+  background: #FFF;
+  border: 1px dashed #D5D5D5;
+  /* 左侧黑色竖条已按用户要求去掉 */
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  max-height: 132px;
+  overflow-y: auto;
+}
+.tn-action-cc-body { white-space: pre-wrap; }
+/* 「——TruthNote 核查」署名居右 */
+.tn-action-cc-attr {
+  margin-top: 6px;
+  text-align: right;
+  font-size: 11px;
+  color: #888;
+}
+/* 复制纠正卡 + 上传社会辟谣库 两个动作并排 */
+.tn-action-cc-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tn-action-cc-upload { background: #FFF; }
+.tn-action-btn {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border: 1px solid #000;
+  background: #FFF;
+  color: #000;
+  cursor: pointer;
+  transition: background 150ms, color 150ms, transform 120ms;
+}
+.tn-action-btn:hover { background: #000; color: #FFF; }
+.tn-action-btn:active { transform: scale(0.96); }
+.tn-action-btn--primary { background: #000; color: #FFF; }
+.tn-action-btn--primary:hover { background: #222; }
+.tn-action-btn.is-done {
+  background: #3ECF72;
+  color: #06351A;
+  border-color: #3ECF72;
+}
+.tn-action-btn:disabled { cursor: default; opacity: 0.9; }
+
+/* 订阅回填 */
+.tn-action-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FFF7E6;
+  border: 1px solid rgba(255,176,32,0.4);
+  padding: 7px 10px;
+  margin-bottom: 8px;
+}
+.tn-action-sub-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.tn-action-sub-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #A26800;
+}
+.tn-action-sub-note { font-size: 11px; color: #7A5200; line-height: 1.4; }
+.tn-action-btn--sub {
+  border-color: #FFB020;
+  color: #A26800;
+  flex-shrink: 0;
+}
+.tn-action-btn--sub:hover { background: #FFB020; color: #000; }
+
+/* 官方核实 / 举报渠道 */
+.tn-action-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tn-action-channel {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 6px;
+  text-decoration: none;
+  border: 1px solid #EEE;
+  background: #FFF;
+  transition: border-color 150ms, background 150ms;
+}
+a.tn-action-channel:hover { border-color: #000; background: #FAFAFA; }
+.tn-action-channel--nolink { cursor: default; }
+.tn-action-channel-kind {
+  font-size: 9px;
+  font-weight: 700;
+  color: #FFF;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+.tn-action-channel--official .tn-action-channel-kind { background: #4A90D9; }
+.tn-action-channel--report .tn-action-channel-kind { background: #F43939; }
+.tn-action-channel-name {
+  font-size: 11px;
+  color: #1A1A1A;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.tn-action-channel-desc {
+  font-size: 10px;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 动作控制区（处置后整体折叠隐藏，换成回执卡） */
+.tn-action-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* no_action（属实）绿色 chip */
+.tn-action-chip {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+}
+.tn-action-chip--ok {
+  background: #E8F8ED;
+  color: #2A8F4F;
+  border: 1px solid rgba(62,207,114,0.4);
+}
+
+/* 去举报主 CTA（诈骗）：红色危险按钮 */
+.tn-action-btn--danger {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  background: #F43939;
+  color: #FFF;
+  border-color: #F43939;
+}
+.tn-action-btn--danger:hover { background: #D72020; color: #FFF; }
+
+/* 订阅块顶行 + watch_sources */
+.tn-action-sub-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.tn-action-sub-topic {
+  font-size: 11px;
+  color: #7A5200;
+  font-weight: 600;
+}
+.tn-action-watch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.tn-action-watch-label {
+  font-size: 10px;
+  color: #A26800;
+  font-weight: 600;
+}
+.tn-action-watch-src {
+  font-size: 10px;
+  color: #7A5200;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,176,32,0.5);
+}
+a.tn-action-watch-src:hover { color: #000; }
+
+/* 处置回执卡（闭环在用户侧"看得见地"合上那一下） */
+.tn-receipt {
+  border: 1px solid;
+  padding: 8px 10px;
+}
+.tn-receipt--sent     { background: #E8F8ED; border-color: rgba(62,207,114,0.5); }
+.tn-receipt--resolved { background: #E8F8ED; border-color: rgba(62,207,114,0.5); }
+.tn-receipt--dismissed{ background: #F5F5F5; border-color: #DDD; }
+.tn-receipt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.tn-receipt-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #2A8F4F;
+}
+.tn-receipt--dismissed .tn-receipt-label { color: #666; }
+.tn-receipt-id {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #2A8F4F;
+  background: rgba(62,207,114,0.15);
+  padding: 1px 6px;
+}
+.tn-receipt--dismissed .tn-receipt-id { color: #666; background: #EEE; }
+.tn-receipt-msg {
+  font-size: 11px;
+  color: #333;
+  line-height: 1.5;
+}
+.tn-receipt-next {
+  font-size: 10px;
+  color: #777;
+  line-height: 1.5;
+  margin-top: 3px;
+}
+
+/* ============================================================
+   思维链条 reasoning_chain（具象过程展示，让用户从案例里学辨别方法）
+   不要 numbered list 默认样式 —— 我们用自己的方块序号 + 详情体
+   ============================================================ */
+.tn-chain-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  counter-reset: tn-chain;
+}
+.tn-chain-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #EEE;
+}
+.tn-chain-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.tn-chain-num {
+  width: 20px;
+  height: 20px;
+  background: #000;
+  color: #FFF;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.tn-chain-body {
+  flex: 1;
+  min-width: 0;
+}
+.tn-chain-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1A1A1A;
+  line-height: 1.4;
+  margin-bottom: 3px;
+}
+.tn-chain-detail {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.6;
+}
+.tn-chain-text {
+  font-size: 12px;
+  color: #1A1A1A;
+  line-height: 1.5;
+}
+.tn-chain-points {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+}
+.tn-chain-points li {
+  font-size: 11px;
+  color: #1A1A1A;
+  line-height: 1.5;
+  padding: 2px 0 2px 12px;
+  position: relative;
+}
+.tn-chain-points li::before {
+  content: "·";
+  position: absolute;
+  left: 2px;
+  color: #000;
+  font-weight: 700;
+}
+
+/* ============================================================
+   揭晓动效（final 卡 reasoning_chain 逐条显形 + verification_grid 翻牌）
+   全部 transform/opacity 单次入场（forwards，不进稳态循环），合成器层、0 reflow。
+   reduced-motion 兜底在 content.css @media 块里（已加同名选择器）。
+   ============================================================ */
+
+/* —— reasoning_chain 逐条显形：item 落入 → 序号 spring 盖下 → 标题滑入 → detail 淡入 ——
+   --i 由 .tn-chain-item 承载并被子元素继承，故各层用同一 --i 算各自延迟。 */
+.tn-chain-reveal {
+  opacity: 0;
+  animation: tn-chain-item-in var(--tn-mo-enter) var(--tn-ease-enter) forwards;
+  animation-delay: calc(var(--i, 0) * var(--tn-mo-chain) + 180ms);
+}
+@keyframes tn-chain-item-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tn-chain-reveal .tn-chain-num {
+  opacity: 0;
+  transform: scale(0.8);
+  animation: tn-chain-num-in 360ms var(--tn-ease-spring) forwards;
+  animation-delay: calc(var(--i, 0) * var(--tn-mo-chain) + 180ms);
+}
+@keyframes tn-chain-num-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.tn-chain-reveal .tn-chain-title {
+  opacity: 0;
+  transform: translateX(-6px);
+  animation: tn-chain-line-in var(--tn-mo-enter) var(--tn-ease-enter) forwards;
+  animation-delay: calc(var(--i, 0) * var(--tn-mo-chain) + 270ms);
+}
+@keyframes tn-chain-line-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.tn-chain-reveal .tn-chain-detail,
+.tn-chain-reveal .tn-chain-text,
+.tn-chain-reveal .tn-chain-points {
+  opacity: 0;
+  animation: tn-chain-fade-in var(--tn-mo-enter) var(--tn-ease-enter) forwards;
+  animation-delay: calc(var(--i, 0) * var(--tn-mo-chain) + 350ms);
+}
+@keyframes tn-chain-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* —— verification_grid verdict 逐条「翻牌」：rotateX(-90→0) + spring 回弹 ——
+   --i 继承自 .tn-verify-item（tn-stagger），判定胶囊在条目入场后再翻。
+   只动 transform/opacity，三色仍守 verdict 编码（无 glow，符合色彩纪律）。 */
+.tn-verify-flip {
+  opacity: 0;
+  transform: perspective(400px) rotateX(-90deg);
+  transform-origin: center;
+  backface-visibility: hidden;
+  animation: tn-verdict-flip 380ms var(--tn-ease-spring) forwards;
+  animation-delay: calc(var(--i, 0) * var(--tn-stagger-step) + 230ms);
+}
+@keyframes tn-verdict-flip {
+  0%   { opacity: 0; transform: perspective(400px) rotateX(-90deg); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: perspective(400px) rotateX(0deg); }
+}
+
+/* —— reasoning_chain 折叠：默认收起，点击折叠头展开（展开瞬间内部逐条显形）—— */
+.tn-chain-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.tn-chain-toggle .tn-final-section-title {
+  margin-bottom: 0;
+}
+.tn-chain-toggle-hint {
+  font-size: 10px;
+  color: #BBB;
+  margin-left: auto;
+  transition: opacity var(--tn-mo-fast) var(--tn-ease-out);
+}
+.tn-chain-section.is-open .tn-chain-toggle-hint {
+  opacity: 0;
+}
+.tn-chain-caret {
+  font-size: 9px;
+  color: #999;
+  flex-shrink: 0;
+  transition: transform var(--tn-mo-fast) var(--tn-ease-out);
+}
+.tn-chain-section:not(.is-open) .tn-chain-caret {
+  margin-left: auto; /* 收起时没有 hint 占位，箭头靠右 */
+}
+.tn-chain-section.is-open .tn-chain-caret {
+  transform: rotate(90deg);
+}
+.tn-chain-toggle:hover .tn-chain-caret,
+.tn-chain-toggle:hover .tn-final-section-title {
+  color: #000;
+}
+.tn-chain-collapse {
+  display: none;
+}
+.tn-chain-section.is-open .tn-chain-collapse {
+  display: block;
+}
+.tn-chain-collapse .tn-chain-list {
+  margin-top: 8px;
+}

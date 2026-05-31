@@ -1,0 +1,62 @@
+:root {
+  --tn-black: #000000;
+  --tn-white: #FFFFFF;
+
+  --tn-true: #3ECF72;
+  --tn-false: #F43939;
+  --tn-unverified: #FFB020;
+  --tn-true-bg: #E8F8ED;
+  --tn-false-bg: #FDE8E8;
+  --tn-unverified-bg: #FFF3DB;
+
+  --tn-bg-page: #F5F5F5;
+  --tn-bg-card: #FFFFFF;
+  --tn-text-primary: #000000;
+  --tn-text-secondary: #666666;
+  --tn-text-tertiary: #999999;
+  --tn-border: #E5E5E5;
+  --tn-info: #4A90D9;
+
+  --tn-xs: 4px;
+  --tn-sm: 8px;
+  --tn-md: 12px;
+  --tn-lg: 16px;
+  --tn-xl: 20px;
+  --tn-2xl: 24px;
+  --tn-3xl: 32px;
+
+  --tn-radius: 2px;
+  --tn-radius-none: 0px;
+
+  --tn-font-cn: "Alibaba PuHuiTi", "Source Han Sans", "Microsoft YaHei", sans-serif;
+  --tn-font-en: "Inter", "SF Pro", sans-serif;
+  --tn-font-mono: "JetBrains Mono", "Menlo", "Consolas", monospace;
+
+  --tn-h1: 20px;
+  --tn-h2: 16px;
+  --tn-body: 14px;
+  --tn-small: 12px;
+  --tn-tag: 11px;
+
+  --tn-popup-width: 360px;
+  --tn-popup-max-height: 560px;
+  --tn-float-width: 320px;
+  --tn-float-max-height: 400px;
+  --tn-sidebar-width: 280px;
+
+  --tn-claim-line-width: 3px;
+  --tn-claim-padding: 12px;
+  --tn-claim-gap: 8px;
+
+  --tn-annotate-line-width: 2px;
+  --tn-annotate-bg-opacity: 0.04;
+
+  --tn-shadow-card: 0 2px 8px rgba(0,0,0,0.08);
+  --tn-shadow-float: 0 4px 16px rgba(0,0,0,0.12);
+  --tn-shadow-sidebar: -4px 0 16px rgba(0,0,0,0.1);
+
+  --tn-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --tn-duration-fast: 150ms;
+  --tn-duration-normal: 200ms;
+  --tn-duration-slow: 300ms;
+}

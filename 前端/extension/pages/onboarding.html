@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>小T</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Alibaba PuHuiTi", "Source Han Sans", "Microsoft YaHei", sans-serif;
+      background: #F5F5F5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .onboarding {
+      width: 360px;
+      background: #FFFFFF;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 32px 40px;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    .ob-eyes {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .ob-eye {
+      width: 16px;
+      height: 16px;
+      background: #000000;
+      animation: breathe 2s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(0.95); }
+    }
+
+    .ob-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+
+    .ob-text {
+      font-size: 14px;
+      color: #666666;
+      margin-bottom: 40px;
+    }
+
+    .ob-trigger-demo {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: #000000;
+      color: #FFFFFF;
+      font-size: 12px;
+      margin-bottom: 32px;
+    }
+
+    .ob-trigger-eye {
+      width: 6px;
+      height: 6px;
+      background: #FFFFFF;
+    }
+
+    .ob-dots {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .ob-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #E5E5E5;
+    }
+
+    .ob-dot.active {
+      background: #000000;
+    }
+
+    .ob-btn {
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: #000000;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 8px 16px;
+    }
+
+    .ob-btn:hover {
+      opacity: 0.7;
+    }
+
+    .ob-btn-primary {
+      background: #000000;
+      color: #FFFFFF;
+      padding: 8px 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding">
+    <div class="slide active" data-step="0">
+      <div class="ob-eyes">
+        <div class="ob-eye"></div>
+        <div class="ob-eye"></div>
+      </div>
+      <div class="ob-name">小T</div>
+      <div class="ob-text">选中网页上的文字。</div>
+      <div class="ob-dots">
+        <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
+      </div>
+      <button class="ob-btn" data-goto="1">下一步 →</button>
+    </div>
+
+    <div class="slide" data-step="1">
+      <div class="ob-trigger-demo">
+        <span class="ob-trigger-eye"></span>
+        <span class="ob-trigger-eye"></span>
+        <span>查</span>
+      </div>
+      <div class="ob-text" style="margin-top:16px">点小T。</div>
+      <div class="ob-dots">
+        <div class="ob-dot"></div>
+        <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
+      </div>
+      <button class="ob-btn" data-goto="2">下一步 →</button>
+    </div>
+
+    <div class="slide" data-step="2">
+      <div class="ob-eyes">
+        <div class="ob-eye"></div>
+        <div class="ob-eye"></div>
+      </div>
+      <div class="ob-text" style="margin-top:16px">看结果。</div>
+      <div class="ob-dots">
+        <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
+        <div class="ob-dot active"></div>
+      </div>
+      <button class="ob-btn ob-btn-primary" data-finish>开始用 →</button>
+    </div>
+  </div>
+
+  <script src="../js/onboarding.js"></script>
+</body>
+</html>
